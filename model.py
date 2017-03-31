@@ -191,13 +191,14 @@ class Keyword_Show(db.Model):
 
     __tablename__ = "keyword_shows"
 
-    keyword_id = db.Column(db.Integer,
-                           db.ForeignKey('keywords.keyword_id'))
-    show_id = db.Column(db.Integer,
-                        db.ForeignKey('shows.show_id'))
     keyword_show_id = db.Column(db.Integer,
                                 primary_key=True,
-                                db.ForeignKey('colors.color_id'))
+                                db.ForeignKey('keywords.keyword_id'))
+    keyword_id = db.Column(db.Integer,
+                           db.ForeignKey('keywords.keyword_id'))
+    review_json = db.Column(db.JSONB)
+    show_id = db.Column(db.Integer,
+                        db.ForeignKey('shows.show_id'))
 
     # Define relationship to Show
     keywords = db.relationship('Keyword')
@@ -212,7 +213,7 @@ class Keyword_Show(db.Model):
 
 
 class Keyword(db.Model):
-    """Show specific color info. elim k_s table put sho-id here"""
+    """Show specific keyword info. elim k_s table put sho-id here"""
 
     __tablename__ = "keywords"
 

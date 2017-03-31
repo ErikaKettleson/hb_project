@@ -1,8 +1,26 @@
 import scrapy
 import re
 
-# REVIEW SCRAPE
+# need to read about ITEM PIPELINE to stick results in a db
+# to dump to JSON: scrapy crawl myspider -o items.json
 
+
+class MySpider(scrapy.Spider):
+    name = 'vogue_runway'
+    allowed_domains = ['vogue.com']
+
+    def start_requests(self):
+        for year in years:
+            for season in seasons:
+                for name, designer_url in designers.iteritems():
+                    return [Request('http://www.vogue.com/fashion-shows/{}-{}-ready-to-wear/{}'.format(year, season, designer_url))]
+
+# need to make request object into a resposne
+    def parse(self, response):
+        get_image_url(response)
+        get_review_bodies(response)
+
+# REVIEW SCRAPE
 
 
 # *****************to loop through p blocks and append to a show list*****************
@@ -22,6 +40,7 @@ import re
 # text = []
 # i = 0
 
+# response = scrapy('http://www.vogue.com/fashion-shows/fall-2017-ready-to-wear/loewe')
 
 # def loop(r):
 #     for row in r:
@@ -44,7 +63,7 @@ designers = {"Acne Studios": "/acne-studios",
              "Bottega Veneta": "/bottega-veneta",
              "Calvin Klein": "/calvin-klein",
              "Carven": "/carven",
-             "Céline": "/celine",
+             # "Céline": "/celine",
              "Chanel": "/chanel",
              "Christian Dior": "/christian-dior",
              "Christopher Kane": "/christopher-kane",
@@ -83,24 +102,21 @@ designers = {"Acne Studios": "/acne-studios",
              "Vetements": "/vetements",
              }
 
-
-
 # PSEUDO CODE loops
-
 # base URL: 'http://www.vogue.com/fashion-shows/SEASON-YEAR-ready-to-wear/DESIGNER'
+def loop:
+    for year in years:
+        for season in seasons:
+            for designer in designers.values():
+                get_review_body(response)
+                get_image_url_list(response)
 
-for year in years:
-    for season in seasons:
-        for designer in designers.values():
-            get_review_body(response)
-            get_image_url_list(response)
 
+# have a separate fxn that just serves the above loop with the designer page to then
+# use my regex fxn 
 
-have a separate fxn that just serves the above loop with the designer page to then
-use my regex fxn 
-
-"def get_image_url_list(r or response.body()) url is passed from the above loop and it returns a list of image URLS"
-WILL RETURN URLLIST
+# "def get_image_url_list(r or response.body()) url is passed from the above loop and it returns a list of image URLS"
+# WILL RETURN URLLIST
 
 # BASE URL
 # http://www.vogue.com/fashion-shows/fall-2017-ready-to-wear/DESIGNER-NAME/slideshow/collection
@@ -124,13 +140,18 @@ def get_image_url(response):
 # http://www.vogue.com/fashion-shows/fall-2017-ready-to-wear/DESIGNER-NAME-HERE
 # ALL REVIEWS ON MAIN DESIGNER PAGE
 # 'response' is feeding URL into scrapy
+# regex = r'("reviewCopy".*</p>)' WORKS IN REGEX101 not here though
+    # review_selectors = response.selector.xpath('//p/text()')
+    # review_selectors = response.selector.xpath('//p')
 
-def get_review_body(response):
+def get_review_bodies(response):
     # selector_list_review: returns a "scrapy.selector.unified.SelectorList"
     review = []
-    review_selectors = response.selector.xpath('//p/text()')
+
+    review_selectors = response.selector.xpath('//script[@type="application/json"]')
+
     for selector in review_selectors:
         # returns a list of the review body
         review.append(selector.extract())
-    print review
-    # db.add(review)
+        # print statements to test it out
+    # db.add(JSON of review)
