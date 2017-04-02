@@ -5,18 +5,63 @@ import os
 import sys
 from webcolors import *
 
-# importing url - the hardcoded image returns the same results
-# this is where 
-response = requests.get('http://assets.vogue.com/photos/58b9348e61606a75f4402f3e/master/pass/_LOE0453.jpg')
-img = Image.open(StringIO(response.content))
+years = [2017]
+seasons = ['fall', 'spring']
+brands = {"Altuzarra": "/altuzarra"}
 
-# img = Image.open("_UMB4717.jpg")
-width, height = img.size
-print width, height
+# brands = {
+#     "Acne Studios": "/acne-studios",
+#     "Alexander McQueen": "/alexander-mcqueen",
+#     "Alexander Wang": "/alexander-wang",
+#     "Altuzarra": "/altuzarra",
+#     "Ann Demeulemeester": "/ann-demeulemeester",
+#     "Antonio Berardi": "/antonio-berardi",
+#     "Balenciaga": "/balenciaga",
+#     "Balmain": "/balmain",
+#     "Bottega Veneta": "/bottega-veneta",
+#     "Calvin Klein": "/calvin-klein",
+#     "Carven": "/carven",
+#     "Celine": "/celine",
+#     "Chanel": "/chanel",
+#     "Christian Dior": "/christian-dior",
+#     "Christopher Kane": "/christopher-kane",
+#     "Comme Des Garcons": "/comme-des-garcons",
+#     "Derek Lam": "/derek-lam",
+#     "Isabel Marant": "/isabel-marant",
+#     "Dolce Gabbana": "/dolce-gabbana",
+#     "Dries Van Noten": "/dries-van-noten",
+#     "Etro": "/etro",
+#     "Fendi": "/fendi",
+#     "Giambattista Valli": "/giambattista-valli",
+#     "Givenchy": "/givenchy",
+#     "Gucci": "/gucci",
+#     "Hermes": "/hermes",
+#     "J.W. Anderson": "/j-w-anderson",
+#     "Junya Watanabe": "/junya-watanabe",
+#     "Kenzo": "/kenzo",
+#     "Lanvin": "/lanvin",
+#     "Loewe": "/loewe",
+#     "Louis Vuitton": "/louis-vuitton",
+#     "Maison Margiela": "/maison-martin-margiela",
+#     "Marc Jacobs": "/marc-jacobs",
+#     "Marni": "/marni",
+#     "Mary Katrantzou": "/mary-katrantzou",
+#     "Michael Kors": "/michael-kors-collection",
+#     "Miu Miu": "/miu-miu",
+#     "Missoni": "/missoni",
+#     "Oscar de la Renta": "/oscar-de-la-renta",
+#     "Prada": "/prada",
+#     "Proenza Schouler": "/proenza-schouler",
+#     "Roksanda": "/roksanda",
+#     "Stella McCartney": "/stella-mccartney",
+#     "Saint Laurent": "/saint-laurent",
+#     "Tory Burch": "/tory-burch",
+#     "Valentino": "/valentino",
+#     "Vetements": "/vetements",
+# }
 
 
 def image_contents(img):
-    # my_image = Image.open(img)
 
     print "format: ", img.format
     print "size: ", img.size
@@ -25,8 +70,6 @@ def image_contents(img):
     r, g, b = img.getpixel((1, 1))
 
     print "r:", r, "g:", g, "b", b
-
-# image_contents(Image.open('bg_crop1.jpg'))
 
 
 def closest_color(color):
@@ -54,22 +97,35 @@ def closest_color(color):
     return min_colors[min(min_colors.keys())]
 
 
+# def show_colors(final_colors):
+#     # A FXN TO AGGREGATE TOP COLORS BY SHOW
+#     # final_colors is PER image, need to aggregate all final_colors to show colors
+#     show_colors = []
+#     for color in final_colors:
+#         show_colors.append(color)
+
+#     show_colors = final_colors[:6]
+#     return show_colors
+
+
 def get_color_name(color):
-    # otherwise pillow errors out if it doesnt have the exact color name
+    # pillow errors out if it doesnt have the exact color name to rgb
+
+    print "at get_color_name"
     try:
         closest_name = actual_name = rgb_to_name(color)
     except ValueError:
         closest_name = closest_color(color)
         actual_name = None
-    return actual_name, closest_name
+    return closest_name
 
     actual_name, closest_name = get_color_name(color)
 
-    print "closest color name: ", closest_name
+    # print "closest color name: ", closest_name
 
 
 def get_colors(img, img2):
-    # convert to palette format to getcolors, sort them & call get_color_name
+    # convert to palette format to getcolors, sort & call get_color_name
 
     img = img.convert('P')
     img2 = img2.convert('P')
@@ -77,9 +133,9 @@ def get_colors(img, img2):
     bg_top_colors = sorted(img2.convert('RGB').getcolors(), reverse=True)[:20]
     top_colors = sorted(img.convert('RGB').getcolors(), reverse=True)[:15]
     print "bg colors:", bg_top_colors
-    # print "main crop colors:", top_colors
     final_bg_colors = []
     final_colors = []
+    final_named_colors = []
 
     i = 0
     for count, rgb in bg_top_colors:
@@ -95,19 +151,26 @@ def get_colors(img, img2):
             final_colors.append(top_rgb)
         else:
             pass
-    print "final main colors w/o bg", final_colors[:5]
-    final_colors = final_colors[:5]
+    print "final main colors w/o bg", final_colors[:6]
+    final_colors = final_colors[:6]
 
     for color in final_colors:
-        print "names:", get_color_name(color)
+        named_color = get_color_name(color)
+        final_named_colors.append(named_color)
+    return final_named_colors
 
-
-# get_colors(img)
+    # return final_colors
+    # print type(final_colors)
+    # show_colors(final_colors)
+    # call the show colors fxn here to get top colors for overall show
 
 
 def crop_image(img):
     # crop the image and background sample
+
     print "hello at crop!"
+
+    width, height = img.size
 
     left_box = ((.30) * width)
     top_box = ((.15) * height)
@@ -125,9 +188,58 @@ def crop_image(img):
 
     crop = img.crop(box)
     bg_crop = img.crop(bg_box)
-    crop.save("my_sweet7.jpg")
-    bg_crop.save("bg_sweet_crop7.jpg")
-    get_colors(crop, bg_crop)
+    return get_colors(crop, bg_crop)
 
 
-crop_image(img)
+
+def pillow_loop(img_urls):
+    # for url in img_urls:
+    print "URL:", img_urls
+    response = requests.get(img_urls)
+    img = Image.open(StringIO(response.content))
+    print "heading to crop"
+    return crop_image(img)
+
+
+def img_urls(show_url):
+    # this returns a list of images for a show
+    image_urls = set()
+
+    print "getting: %s" % show_url
+    r = requests.get(show_url)
+    if r.status_code == 200:
+        print "got a hit!"
+        html_body = r.text.split(",")
+        for l in html_body:
+            match = re.match(r'.*(http:.*/_(?!ARC|AG|UMB).*.jpg).*', l)
+            # match = re.match(r'.*(http:\/\/assets.vogue.com\/photos\/.*\/master\/pass\/.*.[jpg|JPG]).*', l)
+            if match:
+                image_urls.add(match.group(1))
+    print "image urls:", image_urls
+    # print len(image_urls)
+    # image_urls = list(image_urls)
+    return list(image_urls)
+    # pillow_loop(image_urls)
+
+
+def feed_urls():
+    # main fxn to call url generator and aggregate top colors by show
+    generated_urls = {year: {season: {brand: 'http://www.vogue.com/fashion-shows/{}-{}-ready-to-wear{}'.format(season, year, brand_url) for brand, brand_url in brands.items()} for season in seasons} for year in years}
+    print "generated urls:", generated_urls
+    for year in generated_urls.keys():
+        for season in generated_urls[year].keys():
+            for brand, brand_url in generated_urls[year][season].items():
+                print "generated urls", generated_urls
+                print "brand url:", brand_url
+                print "brand name:", brand
+                image_urls = img_urls(brand_url)
+                top_show_colors = []
+                for url in image_urls:
+                    final_named_colors = pillow_loop(url)
+                    print "at feed urls, final colors: ", final_named_colors
+                    for color in final_named_colors:
+                        top_show_colors.append(color)
+                print "TOP SHOW COLORS: ", top_show_colors[:10]
+                # print "show colors", show_colors
+                # call a db adding fxn here, pass in show_colors, season, year, brand
+                # db.add stuff in here
