@@ -1,3 +1,11 @@
+"""Utility file to seed database from pillow data/"""
+
+import datetime
+from sqlalchemy import func
+
+from model import Show, Show_Color, Brand, Image, Color, connect_to_db, db
+from server import app
+
 from PIL import Image, ImageDraw, ImageColor, ImageFilter
 import requests
 from StringIO import StringIO
@@ -7,58 +15,59 @@ from webcolors import *
 
 years = [2017]
 seasons = ['fall', 'spring']
-brands = {"Altuzarra": "/altuzarra"}
+# brands = {"Altuzarra": "/altuzarra"}
+brands = {
+    "Acne Studios": "/acne-studios",
+    "Alexander McQueen": "/alexander-mcqueen",
+    "Alexander Wang": "/alexander-wang",
+    "Altuzarra": "/altuzarra",
+    "Ann Demeulemeester": "/ann-demeulemeester",
+    "Antonio Berardi": "/antonio-berardi",
+    "Balenciaga": "/balenciaga",
+    "Balmain": "/balmain",
+    "Bottega Veneta": "/bottega-veneta",
+    "Calvin Klein": "/calvin-klein",
+    "Carven": "/carven",
+    "Celine": "/celine",
+    "Chanel": "/chanel",
+    "Christian Dior": "/christian-dior",
+    "Christopher Kane": "/christopher-kane",
+    "Comme Des Garcons": "/comme-des-garcons",
+    "Derek Lam": "/derek-lam",
+    "Isabel Marant": "/isabel-marant",
+    "Dolce Gabbana": "/dolce-gabbana",
+    "Dries Van Noten": "/dries-van-noten",
+    "Etro": "/etro",
+    "Fendi": "/fendi",
+    "Giambattista Valli": "/giambattista-valli",
+    "Givenchy": "/givenchy",
+    "Gucci": "/gucci",
+    "Hermes": "/hermes",
+    "J.W. Anderson": "/j-w-anderson",
+    "Junya Watanabe": "/junya-watanabe",
+    "Kenzo": "/kenzo",
+    "Lanvin": "/lanvin",
+    "Loewe": "/loewe",
+    "Louis Vuitton": "/louis-vuitton",
+    "Maison Margiela": "/maison-martin-margiela",
+    "Marc Jacobs": "/marc-jacobs",
+    "Marni": "/marni",
+    "Mary Katrantzou": "/mary-katrantzou",
+    "Michael Kors": "/michael-kors-collection",
+    "Miu Miu": "/miu-miu",
+    "Missoni": "/missoni",
+    "Oscar de la Renta": "/oscar-de-la-renta",
+    "Prada": "/prada",
+    "Proenza Schouler": "/proenza-schouler",
+    "Roksanda": "/roksanda",
+    "Stella McCartney": "/stella-mccartney",
+    "Saint Laurent": "/saint-laurent",
+    "Tory Burch": "/tory-burch",
+    "Valentino": "/valentino",
+    "Vetements": "/vetements",
+}
 
-# brands = {
-#     "Acne Studios": "/acne-studios",
-#     "Alexander McQueen": "/alexander-mcqueen",
-#     "Alexander Wang": "/alexander-wang",
-#     "Altuzarra": "/altuzarra",
-#     "Ann Demeulemeester": "/ann-demeulemeester",
-#     "Antonio Berardi": "/antonio-berardi",
-#     "Balenciaga": "/balenciaga",
-#     "Balmain": "/balmain",
-#     "Bottega Veneta": "/bottega-veneta",
-#     "Calvin Klein": "/calvin-klein",
-#     "Carven": "/carven",
-#     "Celine": "/celine",
-#     "Chanel": "/chanel",
-#     "Christian Dior": "/christian-dior",
-#     "Christopher Kane": "/christopher-kane",
-#     "Comme Des Garcons": "/comme-des-garcons",
-#     "Derek Lam": "/derek-lam",
-#     "Isabel Marant": "/isabel-marant",
-#     "Dolce Gabbana": "/dolce-gabbana",
-#     "Dries Van Noten": "/dries-van-noten",
-#     "Etro": "/etro",
-#     "Fendi": "/fendi",
-#     "Giambattista Valli": "/giambattista-valli",
-#     "Givenchy": "/givenchy",
-#     "Gucci": "/gucci",
-#     "Hermes": "/hermes",
-#     "J.W. Anderson": "/j-w-anderson",
-#     "Junya Watanabe": "/junya-watanabe",
-#     "Kenzo": "/kenzo",
-#     "Lanvin": "/lanvin",
-#     "Loewe": "/loewe",
-#     "Louis Vuitton": "/louis-vuitton",
-#     "Maison Margiela": "/maison-martin-margiela",
-#     "Marc Jacobs": "/marc-jacobs",
-#     "Marni": "/marni",
-#     "Mary Katrantzou": "/mary-katrantzou",
-#     "Michael Kors": "/michael-kors-collection",
-#     "Miu Miu": "/miu-miu",
-#     "Missoni": "/missoni",
-#     "Oscar de la Renta": "/oscar-de-la-renta",
-#     "Prada": "/prada",
-#     "Proenza Schouler": "/proenza-schouler",
-#     "Roksanda": "/roksanda",
-#     "Stella McCartney": "/stella-mccartney",
-#     "Saint Laurent": "/saint-laurent",
-#     "Tory Burch": "/tory-burch",
-#     "Valentino": "/valentino",
-#     "Vetements": "/vetements",
-# }
+
 
 
 def image_contents(img):
@@ -242,6 +251,81 @@ def feed_urls():
                 count_colors = {color: top_show_colors.count(color) for color in top_show_colors}
                 top_show_colors = sorted(set(top_show_colors), key=count_colors.get, reverse=True)
                 print "TOP SHOW COLORS: ", top_show_colors[:10]
+
                 # print "show colors", show_colors
                 # call a db adding fxn here, pass in show_colors, season, year, brand
                 # db.add stuff in here
+
+
+def load_brands(brands):
+    """Load brands into database."""
+
+    print "Brands"
+
+    for key, value in brands.items():
+        brand_name = key
+
+        brand = Brand(brand_name=brand_name)
+
+    # We need to add to the session or it won't ever be stored
+        db.session.add(brand)
+
+    # Once we're done, we should commit our work
+    db.session.commit()
+
+
+def load_colors():
+    """Load colors/hex from css3 dict into database."""
+
+    print "Color"
+
+    for key, value in css3_hex_to_names.items():
+        color_hex, color_name = key, value
+        color = Color(color_hex=color_hex,
+                      color_name=color_name)
+
+        db.session.add(color)
+
+    # Once we're done, we should commit our work
+    db.session.commit()
+
+
+def load_show(seasons, years, brand):
+    """Load shows into database."""
+
+    print "Show"
+
+    season = season for season in seasons
+    year = year for year in years
+    brand_id = query.filter(Brand.brand_name == brand)
+    # NEED TO ADD BRAND_ID, NOT BRAND_NAME...
+
+    show = Show(season=season,
+                year=year,
+                brand_id=brand_id)
+
+    # We need to add to the session or it won't ever be stored
+    db.session.add(show)
+
+    # Once we're done, we should commit our work
+    db.session.commit()
+
+
+def set_val_user_id():
+    """Set value for the next user_id after seeding database"""
+
+    # Get the Max user_id in the database
+    result = db.session.query(func.max(User.user_id)).one()
+    max_id = int(result[0])
+
+    # Set the value for the next user_id to be max_id + 1
+    query = "SELECT setval('users_user_id_seq', :new_id)"
+    db.session.execute(query, {'new_id': max_id + 1})
+    db.session.commit()
+
+
+if __name__ == "__main__":
+    connect_to_db(app)
+    db.create_all()
+
+    feed_urls()

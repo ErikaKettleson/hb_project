@@ -10,10 +10,6 @@ db = SQLAlchemy()
 
 
 ##############################################################################
-# Part 1: Compose ORM
-
-
-# look at relationships - read the data modeling lecture about many to many
 
 class Show(db.Model):
     """Runway show details."""
@@ -27,13 +23,10 @@ class Show(db.Model):
     year = db.Column(db.Integer)
     brand_id = db.Column(db.Integer,
                          db.ForeignKey('brands.brand_id'))
-    designer_id = db.Column(db.Integer,
-                            db.ForeignKey('designers.designer_id')
-                            nullable=True)
 
     # Define relationship to season
     brands = db.relationship('Brand')
-    designers = db.relationship('Designer')
+    # designers = db.relationship('Designer')
 
     def __repr__(self):
         return "<Show show_id=%s season=%s brand_id=%s year=%s>" % (
@@ -86,6 +79,7 @@ class Color(db.Model):
                          autoincrement=True,
                          primary_key=True)
     color_name = db.Column(db.Unicode)
+    color_hex = db.Column(db.Unicode)
 
     # Define relationship to Show
     show_colors = db.relationship('Show_Color')
