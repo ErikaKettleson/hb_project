@@ -1,9 +1,9 @@
 """Utility file to seed database from pillow data/"""
 
-import datetime
+# import datetime
 from sqlalchemy import func
 
-from model import Show, Show_Color, Brand, Image, Color, connect_to_db, db
+from model import Show, Show_Color, Brand, Color, connect_to_db, db
 from server import app
 
 from PIL import Image, ImageDraw, ImageColor, ImageFilter
@@ -14,7 +14,7 @@ import sys
 from webcolors import *
 
 years = [2017]
-seasons = ['fall', 'spring']
+seasons = ['fall']
 # brands = {"Altuzarra": "/altuzarra"}
 brands = {
     "Acne Studios": "/acne-studios",
@@ -250,11 +250,8 @@ def feed_urls():
                         top_show_colors.append(color)
                 count_colors = {color: top_show_colors.count(color) for color in top_show_colors}
                 top_show_colors = sorted(set(top_show_colors), key=count_colors.get, reverse=True)
-                print "TOP SHOW COLORS: ", top_show_colors[:10]
-
-                # print "show colors", show_colors
-                # call a db adding fxn here, pass in show_colors, season, year, brand
-                # db.add stuff in here
+                top_show_colors = top_show_colors[:10]
+                return top_show_colors
 
 
 def load_brands(brands):
@@ -290,15 +287,14 @@ def load_colors():
     db.session.commit()
 
 
-def load_show(seasons, years, brand):
+def load_show(seasons, years, brands):
     """Load shows into database."""
 
     print "Show"
-
-    season = season for season in seasons
-    year = year for year in years
-    brand_id = query.filter(Brand.brand_name == brand)
-    # NEED TO ADD BRAND_ID, NOT BRAND_NAME...
+    # do i need to unpack these???
+    season = season
+    year = year
+    brand_id = query.filter(Brand.brand_name == brand).one().brand_id
 
     show = Show(season=season,
                 year=year,
@@ -311,16 +307,22 @@ def load_show(seasons, years, brand):
     db.session.commit()
 
 
-def set_val_user_id():
-    """Set value for the next user_id after seeding database"""
+def load_show_colors(top_show_colors, brands, years, seasons):
+    """Set value for each shows top 6 colors & seed """
 
-    # Get the Max user_id in the database
-    result = db.session.query(func.max(User.user_id)).one()
-    max_id = int(result[0])
+    show_id = db.session.query(Show.season == season,
+                               Show.year == year,
+                               (Show.brands.brand_name == brand)).one().show_id
+    # DOES THe above EVEN WORK?????
 
-    # Set the value for the next user_id to be max_id + 1
-    query = "SELECT setval('users_user_id_seq', :new_id)"
-    db.session.execute(query, {'new_id': max_id + 1})
+    color_id_1 = db.session.query(Color.color_name == top_show_colors[0]).one().color_id
+    color_id_2 = db.session.query(Color.color_name == top_show_colors[1]).one().color_id
+    color_id_3 = db.session.query(Color.color_name == top_show_colors[2]).one().color_id
+    color_id_4 = db.session.query(Color.color_name == top_show_colors[3]).one().color_id
+    color_id_5 = db.session.query(Color.color_name == top_show_colors[4]).one().color_id
+    color_id_6 = db.session.query(Color.color_name == top_show_colors[5]).one().color_id
+
+    # db.session.execute(query, {'new_id': max_id + 1})
     db.session.commit()
 
 
@@ -328,4 +330,6 @@ if __name__ == "__main__":
     connect_to_db(app)
     db.create_all()
 
-    feed_urls()
+    load_brands(brands)
+    load_colors()
+    # feed_urls()

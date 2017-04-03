@@ -24,9 +24,8 @@ class Show(db.Model):
     brand_id = db.Column(db.Integer,
                          db.ForeignKey('brands.brand_id'))
 
-    # Define relationship to season
+    # Define relationship to brands
     brands = db.relationship('Brand')
-    # designers = db.relationship('Designer')
 
     def __repr__(self):
         return "<Show show_id=%s season=%s brand_id=%s year=%s>" % (
@@ -37,7 +36,7 @@ class Show(db.Model):
 
 
 class Show_Color(db.Model):
-    """Show specific color info."""
+    """Association table connecting specific color info to shows."""
 
     __tablename__ = "show_colors"
 
@@ -46,28 +45,18 @@ class Show_Color(db.Model):
                                primary_key=True)
     show_id = db.Column(db.Integer,
                         db.ForeignKey('shows.show_id'))
-    color_id_1 = db.Column(db.Integer,
-                           db.ForeignKey('colors.color_id_1'))
-    color_id_2 = db.Column(db.Integer,
-                           db.ForeignKey('colors.color_id_2'))
-    color_id_3 = db.Column(db.Integer,
-                           db.ForeignKey('colors.color_id_3'))
-    color_id_4 = db.Column(db.Integer,
-                           db.ForeignKey('colors.color_id_4'))
-    color_id_5 = db.Column(db.Integer,
-                           db.ForeignKey('colors.color_id_5'))
-    color_id_6 = db.Column(db.Integer,
-                           db.ForeignKey('colors.color_id_6'))
+    color_id = db.Column(db.Integer,
+                         db.ForeignKey('colors.color_id'))
 
-    # Define relationship to Show
+    # Define relationship to Show & Color tables
     shows = db.relationship('Show')
     colors = db.relationship('Color')
 
     def __repr__(self):
-        return "<Show_Color show_color_id=%s show_id=%s color_id_1=%s" % (
+        return "<Show_Color show_color_id=%s show_id=%s color_id=%s" % (
             self.show_color_id,
             self.show_id,
-            self.color_id_1)
+            self.color_id)
 
 
 class Color(db.Model):
@@ -81,13 +70,29 @@ class Color(db.Model):
     color_name = db.Column(db.Unicode)
     color_hex = db.Column(db.Unicode)
 
-    # Define relationship to Show
-    show_colors = db.relationship('Show_Color')
-
     def __repr__(self):
         return "<Color color_id=%s color_name=%s>" % (
             self.color_id,
             self.color_name)
+
+
+class Brand(db.Model):
+    """Show brand info."""
+
+    __tablename__ = "brands"
+
+    brand_id = db.Column(db.Integer,
+                         autoincrement=True,
+                         primary_key=True)
+    brand_name = db.Column(db.String(50))
+
+    # Define relationship to Show
+    shows = db.relationship('Show')
+
+    def __repr__(self):
+        return "<Model brand_name=%s brand_id=%s>" % (
+            self.brand_name,
+            self.brand_id)
 
 
 # class Image(db.Model):
@@ -110,25 +115,6 @@ class Color(db.Model):
 #             self.image_id,
 #             self.show_id,
 #             self.image_url)
-
-
-class Brand(db.Model):
-    """Show brand info."""
-
-    __tablename__ = "brands"
-
-    brand_id = db.Column(db.Integer,
-                         autoincrement=True,
-                         primary_key=True)
-    brand_name = db.Column(db.String(50))
-
-    # Define relationship to Show
-    shows = db.relationship('Show')
-
-    def __repr__(self):
-        return "<Model brand_name=%s brand_id=%s>" % (
-            self.brand_name,
-            self.brand_id)
 
 
 # class Designer(db.Model):
@@ -154,54 +140,6 @@ class Brand(db.Model):
 #     #         self.year)
 
 
-# class Keyword_Show(db.Model):
-#     """Show specific color info."""
-
-#     __tablename__ = "keyword_shows"
-
-#     keyword_show_id = db.Column(db.Integer,
-#                                 primary_key=True,
-#                                 db.ForeignKey('keywords.keyword_id'))
-#     keyword_id = db.Column(db.Integer,
-#                            db.ForeignKey('keywords.keyword_id'))
-#     review_json = db.Column(db.JSONB)
-#     show_id = db.Column(db.Integer,
-#                         db.ForeignKey('shows.show_id'))
-
-#     # Define relationship to Show
-#     keywords = db.relationship('Keyword')
-#     shows = db.relationship('Show')
-#     colors = db.relationship('Color')
-#     # def __repr__(self):
-#     #     return "<Model model_id=%s brand_id=%s name=%s year=%s>" % (
-#     #         self.model_id,
-#     #         self.brand_id,
-#     #         self.name,
-#     #         self.year)
-
-
-# class Keyword(db.Model):
-#     """Show specific keyword info. elim k_s table put sho-id here"""
-
-#     __tablename__ = "keywords"
-
-#     keyword_id = db.Column(db.Integer,
-#                            autoincrement=True,
-#                            primary_key=True)
-#     word = db.Column(db.String(50),
-#                      db.ForeignKey('shows.show_id'))
-
-#     # Define relationship to Show
-#     keyword_show = db.relationship('Keyword_Show')
-
-#     # def __repr__(self):
-#     #     return "<Model model_id=%s brand_id=%s name=%s year=%s>" % (
-#     #         self.model_id,
-#     #         self.brand_id,
-#     #         self.name,
-#     #         self.year)
-
-
 ##############################################################################
 # Helper functions
 
@@ -218,7 +156,7 @@ def connect_to_db(app):
     """Connect the database to our Flask app."""
 
     # Configure to use our database.
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres:///cars'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres:///showme'
     app.config['SQLALCHEMY_ECHO'] = False
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     db.app = app
