@@ -15,59 +15,57 @@ from webcolors import *
 
 years = [2017]
 seasons = ['fall']
-# brands = {"Altuzarra": "/altuzarra"}
-brands = {
-    "Acne Studios": "/acne-studios",
-    "Alexander McQueen": "/alexander-mcqueen",
-    "Alexander Wang": "/alexander-wang",
-    "Altuzarra": "/altuzarra",
-    "Ann Demeulemeester": "/ann-demeulemeester",
-    "Antonio Berardi": "/antonio-berardi",
-    "Balenciaga": "/balenciaga",
-    "Balmain": "/balmain",
-    "Bottega Veneta": "/bottega-veneta",
-    "Calvin Klein": "/calvin-klein",
-    "Carven": "/carven",
-    "Celine": "/celine",
-    "Chanel": "/chanel",
-    "Christian Dior": "/christian-dior",
-    "Christopher Kane": "/christopher-kane",
-    "Comme Des Garcons": "/comme-des-garcons",
-    "Derek Lam": "/derek-lam",
-    "Isabel Marant": "/isabel-marant",
-    "Dolce Gabbana": "/dolce-gabbana",
-    "Dries Van Noten": "/dries-van-noten",
-    "Etro": "/etro",
-    "Fendi": "/fendi",
-    "Giambattista Valli": "/giambattista-valli",
-    "Givenchy": "/givenchy",
-    "Gucci": "/gucci",
-    "Hermes": "/hermes",
-    "J.W. Anderson": "/j-w-anderson",
-    "Junya Watanabe": "/junya-watanabe",
-    "Kenzo": "/kenzo",
-    "Lanvin": "/lanvin",
-    "Loewe": "/loewe",
-    "Louis Vuitton": "/louis-vuitton",
-    "Maison Margiela": "/maison-martin-margiela",
-    "Marc Jacobs": "/marc-jacobs",
-    "Marni": "/marni",
-    "Mary Katrantzou": "/mary-katrantzou",
-    "Michael Kors": "/michael-kors-collection",
-    "Miu Miu": "/miu-miu",
-    "Missoni": "/missoni",
-    "Oscar de la Renta": "/oscar-de-la-renta",
-    "Prada": "/prada",
-    "Proenza Schouler": "/proenza-schouler",
-    "Roksanda": "/roksanda",
-    "Stella McCartney": "/stella-mccartney",
-    "Saint Laurent": "/saint-laurent",
-    "Tory Burch": "/tory-burch",
-    "Valentino": "/valentino",
-    "Vetements": "/vetements",
-}
-
-
+brands = {"Carven": "/carven"}
+# brands = {
+#     "Acne Studios": "/acne-studios",
+#     "Alexander McQueen": "/alexander-mcqueen",
+#     "Alexander Wang": "/alexander-wang",
+#     "Altuzarra": "/altuzarra",
+#     "Ann Demeulemeester": "/ann-demeulemeester",
+#     "Antonio Berardi": "/antonio-berardi",
+#     "Balenciaga": "/balenciaga",
+#     "Balmain": "/balmain",
+#     "Bottega Veneta": "/bottega-veneta",
+#     "Calvin Klein": "/calvin-klein",
+#     "Carven": "/carven",
+#     "Celine": "/celine",
+#     "Chanel": "/chanel",
+#     "Christian Dior": "/christian-dior",
+#     "Christopher Kane": "/christopher-kane",
+#     "Comme Des Garcons": "/comme-des-garcons",
+#     "Derek Lam": "/derek-lam",
+#     "Isabel Marant": "/isabel-marant",
+#     "Dolce Gabbana": "/dolce-gabbana",
+#     "Dries Van Noten": "/dries-van-noten",
+#     "Etro": "/etro",
+#     "Fendi": "/fendi",
+#     "Giambattista Valli": "/giambattista-valli",
+#     "Givenchy": "/givenchy",
+#     "Gucci": "/gucci",
+#     "Hermes": "/hermes",
+#     "J.W. Anderson": "/j-w-anderson",
+#     "Junya Watanabe": "/junya-watanabe",
+#     "Kenzo": "/kenzo",
+#     "Lanvin": "/lanvin",
+#     "Loewe": "/loewe",
+#     "Louis Vuitton": "/louis-vuitton",
+#     "Maison Margiela": "/maison-martin-margiela",
+#     "Marc Jacobs": "/marc-jacobs",
+#     "Marni": "/marni",
+#     "Mary Katrantzou": "/mary-katrantzou",
+#     "Michael Kors": "/michael-kors-collection",
+#     "Miu Miu": "/miu-miu",
+#     "Missoni": "/missoni",
+#     "Oscar de la Renta": "/oscar-de-la-renta",
+#     "Prada": "/prada",
+#     "Proenza Schouler": "/proenza-schouler",
+#     "Roksanda": "/roksanda",
+#     "Stella McCartney": "/stella-mccartney",
+#     "Saint Laurent": "/saint-laurent",
+#     "Tory Burch": "/tory-burch",
+#     "Valentino": "/valentino",
+#     "Vetements": "/vetements",
+# }
 
 
 def image_contents(img):
@@ -134,44 +132,82 @@ def get_color_name(color):
 
 
 def get_colors(img, img2):
-    # convert to palette format to getcolors, sort & call get_color_name
+    # count_colors = {color: top_show_colors.count(color) for color in top_show_colors}
+    # top_show_colors = sorted(set(top_show_colors), key=count_colors.get, reverse=True)
+    # top_show_colors = top_show_colors[:10]
 
+    # testing out different function here
     img = img.convert('P')
     img2 = img2.convert('P')
 
-    bg_top_colors = sorted(img2.convert('RGB').getcolors(), reverse=True)[:20]
-    top_colors = sorted(img.convert('RGB').getcolors(), reverse=True)[:15]
-    print "bg colors:", bg_top_colors
+    bg_colors = (img2.convert('RGB').getcolors())
+    foreground_colors = (img.convert('RGB').getcolors())
+
     final_bg_colors = []
     final_colors = []
     final_named_colors = []
 
-    i = 0
-    for count, rgb in bg_top_colors:
-        top_bg_rgb = bg_top_colors[i][1]
-        final_bg_colors.append(top_bg_rgb)
-        i = i + 1
+    count_bg_colors = {color: bg_colors.count(color) for color in bg_colors}
+    top_bg_colors = sorted(set(count_bg_colors), key=count_bg_colors.get, reverse=True)
 
-    i = 0
-    for count, rgb in top_colors:
-        top_rgb = top_colors[i][1]
-        i = i + 1
-        if top_rgb not in top_bg_rgb:
-            final_colors.append(top_rgb)
+    bg_color_names = (get_color_name(color for colors in top_bg_colors))[:10]
+
+    final_bg_colors.append(bg_color_names)
+
+    count_img_colors = {color: foreground_colors.count(color) for color in foreground_colors}
+    top_img_colors = sorted(set(foreground_colors), key=count_img_colors.get, reverse=True)
+
+    for rgb in top_img_colors:
+        named_color = get_color_name(rgb)
+        if named_color not in final_bg_colors:
+            final_colors.append(named_color)
         else:
             pass
-    print "final main colors w/o bg", final_colors[:6]
-    final_colors = final_colors[:6]
 
-    for color in final_colors:
-        named_color = get_color_name(color)
-        final_named_colors.append(named_color)
+    final_named_colors = final_colors[:10]
+
     return final_named_colors
 
-    # return final_colors
-    # print type(final_colors)
-    # show_colors(final_colors)
-    # call the show colors fxn here to get top colors for overall show
+
+# def get_colors(img, img2):
+#     # convert to palette format to getcolors, sort & call get_color_name
+
+#     img = img.convert('P')
+#     img2 = img2.convert('P')
+
+#     bg_top_colors = sorted(img2.convert('RGB').getcolors(), reverse=True)[:20]
+#     top_colors = sorted(img.convert('RGB').getcolors(), reverse=True)[:15]
+#     print "bg colors:", bg_top_colors
+#     final_bg_colors = []
+#     final_colors = []
+#     final_named_colors = []
+
+#     i = 0
+#     for count, rgb in bg_top_colors:
+#         top_bg_rgb = bg_top_colors[i][1]
+#         final_bg_colors.append(top_bg_rgb)
+#         i = i + 1
+
+#     i = 0
+#     for count, rgb in top_colors:
+#         top_rgb = top_colors[i][1]
+#         i = i + 1
+#         if top_rgb not in top_bg_rgb:
+#             final_colors.append(top_rgb)
+#         else:
+#             pass
+#     print "final main colors w/o bg", final_colors[:6]
+#     final_colors = final_colors[:6]
+
+#     for color in final_colors:
+#         named_color = get_color_name(color)
+#         final_named_colors.append(named_color)
+#     return final_named_colors
+
+#     # return final_colors
+#     # print type(final_colors)
+#     # show_colors(final_colors)
+#     # call the show colors fxn here to get top colors for overall show
 
 
 def crop_image(img):
@@ -239,6 +275,7 @@ def feed_urls():
             for brand, brand_url in generated_urls[year][season].items():
                 print "generated urls", generated_urls
                 print "brand url:", brand_url
+                print "season", season
                 print "brand name:", brand
                 image_urls = img_urls(brand_url)
 
@@ -251,7 +288,7 @@ def feed_urls():
                 count_colors = {color: top_show_colors.count(color) for color in top_show_colors}
                 top_show_colors = sorted(set(top_show_colors), key=count_colors.get, reverse=True)
                 top_show_colors = top_show_colors[:10]
-                return top_show_colors
+                return top_show_colors, year, brand, season
 
 
 def load_brands(brands):
@@ -287,15 +324,14 @@ def load_colors():
     db.session.commit()
 
 
-def load_show(seasons, years, brands):
+def load_show(year, season, brand):
     """Load shows into database."""
 
     print "Show"
-    # do i need to unpack these???
-    season = season
-    year = year
-    brand_id = query.filter(Brand.brand_name == brand).one().brand_id
 
+    brand_id = db.session.query(Brand).filter_by(brand_name=brand).one().brand_id
+
+    year = 2017
     show = Show(season=season,
                 year=year,
                 brand_id=brand_id)
@@ -307,22 +343,15 @@ def load_show(seasons, years, brands):
     db.session.commit()
 
 
-def load_show_colors(top_show_colors, brands, years, seasons):
+def load_show_colors(top_show_colors, brand, year, season):
     """Set value for each shows top 6 colors & seed """
 
     show_id = db.session.query(Show.season == season,
                                Show.year == year,
                                (Show.brands.brand_name == brand)).one().show_id
-    # DOES THe above EVEN WORK?????
 
-    color_id_1 = db.session.query(Color.color_name == top_show_colors[0]).one().color_id
-    color_id_2 = db.session.query(Color.color_name == top_show_colors[1]).one().color_id
-    color_id_3 = db.session.query(Color.color_name == top_show_colors[2]).one().color_id
-    color_id_4 = db.session.query(Color.color_name == top_show_colors[3]).one().color_id
-    color_id_5 = db.session.query(Color.color_name == top_show_colors[4]).one().color_id
-    color_id_6 = db.session.query(Color.color_name == top_show_colors[5]).one().color_id
+    color_id = db.session.query(Color.color_name == (color for colors in top_show_colors)).one().color_id
 
-    # db.session.execute(query, {'new_id': max_id + 1})
     db.session.commit()
 
 
@@ -332,4 +361,6 @@ if __name__ == "__main__":
 
     load_brands(brands)
     load_colors()
-    # feed_urls()
+    top_show_colors, year, brand, season = feed_urls()
+    load_show(year, season, brand)
+    load_show_colors(top_show_colors, brand, year, season)

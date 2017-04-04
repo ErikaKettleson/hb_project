@@ -1,10 +1,6 @@
-"""Models and database functions for cars db."""
+"""Models and database functions for showme db."""
 
 from flask_sqlalchemy import SQLAlchemy
-
-# Here's where we create the idea of our database. We're getting this through
-# the Flask-SQLAlchemy library. On db, we can find the `session`
-# object, where we do most of our interactions (like committing, etc.)
 
 db = SQLAlchemy()
 
@@ -60,7 +56,7 @@ class Show_Color(db.Model):
 
 
 class Color(db.Model):
-    """Show specific color info."""
+    """Show specific color name/hex info."""
 
     __tablename__ = "colors"
 
@@ -94,54 +90,9 @@ class Brand(db.Model):
             self.brand_name,
             self.brand_id)
 
-
-# class Image(db.Model):
-#     """Show image info."""
-
-#     __tablename__ = "images"
-
-#     image_id = db.Column(db.Integer,
-#                          autoincrement=True,
-#                          primary_key=True)
-#     show_id = db.Column(db.Integer,
-#                         db.ForeignKey('shows.show_id'))
-#     image_url = db.Column(db.Unicode(1024))
-
-#     # Define relationship to Show_Color
-#     show_id = db.relationship('Show')
-
-#     def __repr__(self):
-#         return "<Image image_id=%s show_id=%s image_url=%s>" % (
-#             self.image_id,
-#             self.show_id,
-#             self.image_url)
-
-
-# class Designer(db.Model):
-#     """Show designer name info."""
-#     # add a show_desigenr column with s_d_id and show_id and designer_id
-
-#     __tablename__ = "designers"
-
-#     designer_id = db.Column(db.Integer,
-#                             autoincrement=True,
-#                             primary_key=True)
-#     designer_name = db.Column(db.String(50))
-
-#     # Define relationship to Show/Brand
-#     shows = db.relationship('Show')
-#     brands = db.relationship('Brand')
-
-#     # def __repr__(self):
-#     #     return "<Model model_id=%s brand_id=%s name=%s year=%s>" % (
-#     #         self.model_id,
-#     #         self.brand_id,
-#     #         self.name,
-#     #         self.year)
-
-
 ##############################################################################
 # Helper functions
+
 
 def init_app():
     # So that we can use Flask-SQLAlchemy, we'll make a Flask app.
