@@ -49,8 +49,8 @@ class Show_Color(db.Model):
     colors = db.relationship('Color')
 
     def __repr__(self):
-        return "<Show_Color show_color_id=%s show_id=%s color_id=%s" % (
-            self.show_color_id,
+        return "<Show_Color show_colors_id=%s show_id=%s color_id=%s" % (
+            self.show_colors_id,
             self.show_id,
             self.color_id)
 

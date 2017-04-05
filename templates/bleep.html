@@ -1,0 +1,31 @@
+<!doctype html>
+<html>
+<head>
+    <title>ShowMe</title>
+    <link rel="stylesheet" href="bleep.css">
+</head>
+</head>
+<body>
+<h1>ShowMeWhatUGot</h1>
+<br>
+
+<ul> 
+{% for show in shows %}
+    <br>
+        <li>
+        {{ show.season }}{{ show.year }}
+        {{ show.show_id }}
+        </li>
+
+        {% for color_name in colors %}
+            <div class="color"
+                background-color="{{ color_name }}">
+            </div>
+        
+        {% endfor %}
+
+{% endfor %}
+</ul>
+
+</body>
+</html>

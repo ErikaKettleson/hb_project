@@ -14,20 +14,29 @@ app.secret_key = "ABC"
 # Normally, if you use an undefined variable in Jinja2, it fails silently.
 # This is horrible. Fix this so that, instead, it raises an error.
 app.jinja_env.undefined = StrictUndefined
+app.jinja_env.auto_reload = True
+
+@app.route('/')
+def index():
+    """Homepage."""
+    shows = Show.query.all()
+    show_colors = Show_Color.query.all()
+    colors = Color.query.all()
+    brands = Brand.query.all()
+
+    return render_template("bleep.html",
+                           shows=shows,
+                           show_colors=show_colors,
+                           colors=colors,
+                           brands=brands)
+    # return render_template("base.html")
 
 
-# @app.route('/')
-# def index():
-#     """Homepage."""
-
-#     # return render_template("homepage.html")
-
-
-# @app.route('/register', methods=['GET'])
+# @app.route('/', methods=['GET'])
 # def register_form():
 #     """Show form for user signup."""
 
-#     return render_template("register_form.html")
+#     return render_template("base.html")
 
 
 # @app.route('/register', methods=['POST'])
