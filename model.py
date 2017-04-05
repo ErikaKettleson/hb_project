@@ -15,7 +15,7 @@ class Show(db.Model):
     show_id = db.Column(db.Integer,
                         autoincrement=True,
                         primary_key=True)
-    season = db.Column(db.String(5))
+    season = db.Column(db.String(6))
     year = db.Column(db.Integer)
     brand_id = db.Column(db.Integer,
                          db.ForeignKey('brands.brand_id'))
