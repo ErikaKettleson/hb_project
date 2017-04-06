@@ -2,7 +2,6 @@
 <html>
 <head>
     <title>ShowMe</title>
-    <link rel="stylesheet" href="bleep.css">
 </head>
 </head>
 <body>
@@ -10,20 +9,16 @@
 <br>
 
 <ul> 
-{% for show in shows %}
+{% for show_color in show_colors %}
     <br>
         <li>
-        {{ show.season }}{{ show.year }}
-        {{ show.show_id }}
+        {{ show_color.shows.brands.brand_name }} {{show_color.shows.season}}
+        {{ show_color.show_id}}
         </li>
-
-        {% for color_name in colors %}
-            <div class="color"
-                background-color="{{ color_name }}">
-            </div>
-        
-        {% endfor %}
-
+            <div id="color" style="background-color: {{ show_color.colors.color_hex }}; width: 100%; position: relative;">
+                {{ show_color.colors.color_hex }}
+            </div>        
+            
 {% endfor %}
 </ul>
 

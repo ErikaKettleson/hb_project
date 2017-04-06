@@ -16,6 +16,7 @@ app.secret_key = "ABC"
 app.jinja_env.undefined = StrictUndefined
 app.jinja_env.auto_reload = True
 
+
 @app.route('/')
 def index():
     """Homepage."""
