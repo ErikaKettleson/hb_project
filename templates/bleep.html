@@ -2,11 +2,38 @@
 <html>
 <head>
     <title>ShowMe</title>
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
 </head>
 </head>
 <body>
 <h1>ShowMeWhatUGot</h1>
 <br>
+
+<form>
+  Year:
+    <select name="year">
+      <option value="2017">2017</option>
+    </select>
+</form>
+<form>
+  Season:
+    <select name="season">
+      <option value="Fall">Fall</option>
+      <option value="Spring">Spring</option>
+    </select>
+</form>
+<form>
+  Designer:
+    <select name="designer">
+    {% for brand in brands|sort(attribute='brand_name') %}
+      <option value="{{ brand.brand_name }}">{{ brand.brand_name }}</option>
+      {% endfor %}
+    </select>
+</form>
+
 
 <ul> 
 {% for show_color in show_colors %}
@@ -18,7 +45,7 @@
             <div id="color" style="background-color: {{ show_color.colors.color_hex }}; width: 100%; position: relative;">
                 {{ show_color.colors.color_hex }}
             </div>        
-            
+
 {% endfor %}
 </ul>
 
