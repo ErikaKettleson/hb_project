@@ -111,21 +111,74 @@ def get_show_colors_json():
 
     return jsonify(show_colors_json)
 
+# <Show_Color show_colors_id=1 show_id=1 color_id=2
+
 
 @app.route('/_get_color_by_brand')
 def get_colors_by_brand_json():
-    brand_by_colors = {}
-    import ipdb; ipdb.set_trace()
-    for show in Show_Color.query.all():
-        # import ipdb; ipdb.set_trace()
-        show[show_color.shows.brands.brand_id] = {
-            'color_ids': [show_color.color_id],
-            'color_name': show_colors.colors.color_name,
-            'color_hex': show_colors.colors.color_hex,
-            'brand_name': show_colors.shows.brands.brand_name,
-        }
+    brands = Brand.query.all()
+    brand_by_colors = {brand.brand_name: [] for brand in brands}
+    for brand in brands:
+        shows = Show.query.filter_by(
+            brand_id=brand.brand_id,
+        ).all()
+        for show in shows:
+            show_colors = Show_Color.query.filter_by(
+                show_id=show.show_id,
+            ).all()
+            for color in show_colors:
+                color_objects = Color.query.filter_by(
+                    color_id=color.color_id,
+                ).all()
+                for color_object in color_objects:
+                    brand_by_colors[brand.brand_name].append(
+                        color_object.color_name
+                    )
 
     return jsonify(brand_by_colors)
+
+
+@app.route('/pie')
+def pie():
+    brand_id = request.args.get('brand_id')
+    brand_id = 47
+    # this gets changed on query param from dropdown
+    color_counter = []
+
+    shows = Show.query.filter_by(brand_id=brand_id).all()
+
+    for show in shows:
+        show_colors = Show_Color.query.filter_by(show_id=show.show_id).all()
+        for color in show_colors:
+            color_objects = Color.query.filter_by(color_id=color.color_id).all()
+            for color_object in color_objects:
+                color_counter.append(
+                    (color_object.color_name, color_object.color_hex)
+                )
+
+    counts = {color: color_counter.count(color) for color in color_counter}
+    color_name_hex, color_count = counts.keys(), counts.values()
+    color_by_name = []
+    color_by_hex = []
+    for n, h in color_name_hex:
+        color_by_name.append(n)
+        color_by_hex.append(h)
+
+    x = color_by_name
+    data_color = color_count
+    backgroundColor = color_by_hex
+    hoverBackgroundColor = color_by_hex
+
+    data = {
+        'labels': x,
+        'datasets': [{
+            'data': data_color,
+            'backgroundColor': backgroundColor,
+            'hoverBackgroundColor': hoverBackgroundColor
+        }]
+    }
+
+    return jsonify(data)
 
     # show_id route that returns show_id:[color_id[10]]
     # think about the fxn as connectiing many - one color/show/etc

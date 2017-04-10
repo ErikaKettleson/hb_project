@@ -5,6 +5,9 @@
     <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.4/Chart.min.js"></script>
+
+
 </head>
 </head>
 </head>
@@ -48,6 +51,23 @@
 
 {% endfor %}
 </ul>
+<canvas id="chart"></canvas>
+
+<script>
+
+    var options = {};
+    var ctx = document.getElementById("chart").getContext('2d');
+    $.get("/pie", makeDoughnutChart); 
+    function makeDoughnutChart(results) {
+        var myDoughnutChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: results,
+            options: {}
+        });
+    }
+    </script>
+
+
 
 </body>
 </html>

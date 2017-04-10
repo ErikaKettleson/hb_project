@@ -1,0 +1,36 @@
+{% extends 'bleep.html' %}
+
+{% block js %}
+<script src="https://code.jquery.com/jquery.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.2.1/Chart.js"></script>
+
+{% endblock %}
+
+{% block title %}
+    BRAND BY COLORS
+{% endblock %}
+
+{% block content %}
+
+    <h1>All Brand By COLOR</h1>
+    <canvas id="chart"></canvas>
+
+    <script>
+    var options = {};
+    
+    $.get("/pie", makeDoughnutChart); 
+    function makeDoughnutChart(results) {
+         var show = results.labels;
+         var counts = results.counts;
+         var backgroundColor = results.backgroundColor
+         var data = results;
+            var ctx = $('#chart').get(0).getContext('2d');
+            var myLineChart = new Chart(ctx, {
+                type: 'line',
+                data: data,
+                options: options
+            });
+    }
+    </script>
+
+{% endblock %}
