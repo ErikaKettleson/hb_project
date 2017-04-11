@@ -141,7 +141,8 @@ def get_colors_by_brand_json():
 @app.route('/pie')
 def pie():
     brand_id = request.args.get('brand_id')
-    brand_id = 47
+    print "brand_ id:", brand_id
+
     # this gets changed on query param from dropdown
     color_counter = []
 

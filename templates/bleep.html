@@ -15,49 +15,99 @@
 <h1>ShowMeWhatUGot</h1>
 <br>
 
-<form>
+<form name='Year'>
   Year:
     <select name="year">
       <option value="2017">2017</option>
     </select>
 </form>
-<form>
+<form name='Season'>
   Season:
     <select name="season">
       <option value="Fall">Fall</option>
       <option value="Spring">Spring</option>
     </select>
 </form>
-<form>
+<form name='Designer'>
   Designer:
-    <select name="designer">
+    <select name="designer" id='designer'>
     {% for brand in brands|sort(attribute='brand_name') %}
-      <option value="{{ brand.brand_name }}">{{ brand.brand_name }}</option>
+      <option value="{{ brand.brand_id }}">{{ brand.brand_name }}</option>
       {% endfor %}
     </select>
 </form>
 
+<script src="http://code.jquery.com/jquery.js"></script>
 
-<ul> 
+<script type="text/javascript">
+    $('#designer').on('change', function() {
+        getDesignerData($('#designer'))
+    });
+    function getDesignerData(designer) {
+        $.get('/pie', {"brand_id": $('#designer :selected').val()}, function(data) {
+            makeDoughnutChart(data)
+        });
+    }
+</script>
+
+<!-- <ul> 
 {% for show_color in show_colors %}
     <br>
         <li>
         {{ show_color.shows.brands.brand_name }} {{show_color.shows.season}}
         {{ show_color.show_id}}
         </li>
-            <div id="color" style="background-color: {{ show_color.colors.color_hex }}; width: 100%; position: relative;">
+            <div id="color" style="background-color: {{ show_color.colors.color_hex }}; width: 50%; position: relative;">
                 {{ show_color.colors.color_hex }}
             </div>        
 
 {% endfor %}
-</ul>
+</ul> -->
 <canvas id="chart"></canvas>
 
 <script>
 
+    // # add eventlistening on change for form - make ajax call to reload brand_id chosen
+
+    // var brand_id = $('#designer')
+
+    // designer_select.on('change', function() {
+    //     $.get("/pie", {'brand_id': brand_id}, makeDoughnutChart); 
+    // });
+    // console.log('brand_id:', brand_id)
+
+    // function showChart(results) {
+    //     console.dir(results);
+
+        // makeDoughnutChart PLZZZZZ
+    // };
+
+    // function getBrandInfo(evt) {
+    //     var formInput = {
+    //         "brand_id": $('#designer :selected').val()
+    //     };
+    //     $.get("/pie", formInput, makeDoughnutChart(results));
+    // }
+
+    // $("#delivery-form").on("submit", getDeliveryInfo);
+
+    // var brand_id = $('#designer :selected').val();
+
+    // function replaceStatus() {
+    //     var status = brand_id;
+    //     $('#designer').change(function() {
+    //         console.log("in replaceStatus"); 
+    //         $.get("/pie", {'brand_id': brand_id}, makeDoughnutChart); 
+    //         });
+    //     };
+    // replaceStatus()
+
+    
+
     var options = {};
     var ctx = document.getElementById("chart").getContext('2d');
-    $.get("/pie", makeDoughnutChart); 
+
+
     function makeDoughnutChart(results) {
         var myDoughnutChart = new Chart(ctx, {
             type: 'doughnut',
