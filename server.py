@@ -140,44 +140,57 @@ def get_colors_by_brand_json():
 
 @app.route('/pie')
 def pie():
-    brand_id = request.args.get('brand_id')
-    print "brand_ id:", brand_id
 
-    # this gets changed on query param from dropdown
+    brand_id = request.args.get('brand_id')
+    season = request.args.get('season')
+    year = request.args.get('year')
+
+    if brand_id == 'All':
+        brand_id = []
+        for brand in Brand.query.all():
+            brand_id.append(brand.brand_id)
+    # import ipdb; ipdb.set_trace()
     color_counter = []
 
-    shows = Show.query.filter_by(brand_id=brand_id).all()
+    for brand_id in brand_id:
+        if season != 'All':
+            if season == 'Fall':
+                shows = Show.query.filter_by(season='fall', brand_id=brand_id).all()
+            elif season == 'Spring':
+                shows = Show.query.filter_by(season='spring', brand_id=brand_id).all()
+        else:
+            shows = Show.query.filter_by(brand_id=brand_id).all()
 
-    for show in shows:
-        show_colors = Show_Color.query.filter_by(show_id=show.show_id).all()
-        for color in show_colors:
-            color_objects = Color.query.filter_by(color_id=color.color_id).all()
-            for color_object in color_objects:
-                color_counter.append(
-                    (color_object.color_name, color_object.color_hex)
-                )
+        for show in shows:
+            show_colors = Show_Color.query.filter_by(show_id=show.show_id).all()
+            for color in show_colors:
+                color_objects = Color.query.filter_by(color_id=color.color_id).all()
+                for color_object in color_objects:
+                    color_counter.append(
+                        (color_object.color_name, color_object.color_hex)
+                    )
 
-    counts = {color: color_counter.count(color) for color in color_counter}
-    color_name_hex, color_count = counts.keys(), counts.values()
-    color_by_name = []
-    color_by_hex = []
-    for n, h in color_name_hex:
-        color_by_name.append(n)
-        color_by_hex.append(h)
+        counts = {color: color_counter.count(color) for color in color_counter}
+        color_name_hex, color_count = counts.keys(), counts.values()
+        color_by_name = []
+        color_by_hex = []
+        for n, h in color_name_hex:
+            color_by_name.append(n)
+            color_by_hex.append(h)
 
-    x = color_by_name
-    data_color = color_count
-    backgroundColor = color_by_hex
-    hoverBackgroundColor = color_by_hex
+        x = color_by_name
+        data_color = color_count
+        backgroundColor = color_by_hex
+        hoverBackgroundColor = color_by_hex
 
-    data = {
-        'labels': x,
-        'datasets': [{
-            'data': data_color,
-            'backgroundColor': backgroundColor,
-            'hoverBackgroundColor': hoverBackgroundColor
-        }]
-    }
+        data = {
+            'labels': x,
+            'datasets': [{
+                'data': data_color,
+                'backgroundColor': backgroundColor,
+                'hoverBackgroundColor': hoverBackgroundColor
+            }]
+        }
 
     return jsonify(data)
 
