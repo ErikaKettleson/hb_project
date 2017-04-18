@@ -2,83 +2,75 @@
 
 # import datetime
 from sqlalchemy import func
-
+from collections import namedtuple
 from model import Show, Show_Color, Brand, Color, connect_to_db, db
 from server import app
-
+from StringIO import StringIO
+from math import sqrt
+from sklearn.cluster import KMeans
 from PIL import Image, ImageDraw, ImageColor, ImageFilter
 import requests
-from StringIO import StringIO
+import numpy as np
+# from StringIO import StringIO
 import os
+import random
 import sys
 from webcolors import *
 
-import pdb
-
 years = [2017]
-seasons = ['fall', 'spring']
-# brands = {"Carven": "/carven"}
-brands = {
-    "Acne Studios": "/acne-studios",
-    "Alexander McQueen": "/alexander-mcqueen",
-    "Alexander Wang": "/alexander-wang",
-    "Altuzarra": "/altuzarra",
-    "Ann Demeulemeester": "/ann-demeulemeester",
-    "Antonio Berardi": "/antonio-berardi",
-    "Balenciaga": "/balenciaga",
-    "Balmain": "/balmain",
-    "Bottega Veneta": "/bottega-veneta",
-    "Calvin Klein": "/calvin-klein",
-    "Carven": "/carven",
-    "Celine": "/celine",
-    "Chanel": "/chanel",
-    "Christian Dior": "/christian-dior",
-    "Christopher Kane": "/christopher-kane",
-    "Comme Des Garcons": "/comme-des-garcons",
-    "Derek Lam": "/derek-lam",
-    "Isabel Marant": "/isabel-marant",
-    "Dolce Gabbana": "/dolce-gabbana",
-    "Dries Van Noten": "/dries-van-noten",
-    "Etro": "/etro",
-    "Fendi": "/fendi",
-    "Giambattista Valli": "/giambattista-valli",
-    "Givenchy": "/givenchy",
-    "Gucci": "/gucci",
-    "Hermes": "/hermes",
-    "J.W. Anderson": "/j-w-anderson",
-    "Junya Watanabe": "/junya-watanabe",
-    "Kenzo": "/kenzo",
-    "Lanvin": "/lanvin",
-    "Loewe": "/loewe",
-    "Louis Vuitton": "/louis-vuitton",
-    "Maison Margiela": "/maison-martin-margiela",
-    "Marc Jacobs": "/marc-jacobs",
-    "Marni": "/marni",
-    "Mary Katrantzou": "/mary-katrantzou",
-    "Michael Kors": "/michael-kors-collection",
-    "Miu Miu": "/miu-miu",
-    "Missoni": "/missoni",
-    "Oscar de la Renta": "/oscar-de-la-renta",
-    "Prada": "/prada",
-    "Proenza Schouler": "/proenza-schouler",
-    "Roksanda": "/roksanda",
-    "Stella McCartney": "/stella-mccartney",
-    "Saint Laurent": "/saint-laurent",
-    "Tory Burch": "/tory-burch",
-    "Valentino": "/valentino",
-    "Vetements": "/vetements",
-}
-
-
-def image_contents(img):
-
-    print "format: ", img.format
-    print "size: ", img.size
-    print "mode: ", img.mode
-
-    r, g, b = img.getpixel((1, 1))
-
-    print "r:", r, "g:", g, "b", b
+# seasons = ['fall', 'spring']
+seasons = ['spring']
+brands = {"Altuzarra": "/altuzarra"}
+# brands = {
+#     "Acne Studios": "/acne-studios",
+#     "Alexander McQueen": "/alexander-mcqueen",
+#     "Alexander Wang": "/alexander-wang",
+#     "Altuzarra": "/altuzarra",
+#     "Ann Demeulemeester": "/ann-demeulemeester",
+#     "Antonio Berardi": "/antonio-berardi",
+#     "Balenciaga": "/balenciaga",
+#     "Balmain": "/balmain",
+#     "Bottega Veneta": "/bottega-veneta",
+#     "Calvin Klein": "/calvin-klein",
+#     "Carven": "/carven",
+#     "Celine": "/celine",
+#     "Chanel": "/chanel",
+#     "Christian Dior": "/christian-dior",
+#     "Christopher Kane": "/christopher-kane",
+#     "Comme Des Garcons": "/comme-des-garcons",
+#     "Derek Lam": "/derek-lam",
+#     "Isabel Marant": "/isabel-marant",
+#     "Dolce Gabbana": "/dolce-gabbana",
+#     "Dries Van Noten": "/dries-van-noten",
+#     "Etro": "/etro",
+#     "Fendi": "/fendi",
+#     "Giambattista Valli": "/giambattista-valli",
+#     "Givenchy": "/givenchy",
+#     "Gucci": "/gucci",
+#     "Hermes": "/hermes",
+#     "J.W. Anderson": "/j-w-anderson",
+#     "Junya Watanabe": "/junya-watanabe",
+#     "Kenzo": "/kenzo",
+#     "Lanvin": "/lanvin",
+#     "Loewe": "/loewe",
+#     "Louis Vuitton": "/louis-vuitton",
+#     "Maison Margiela": "/maison-martin-margiela",
+#     "Marc Jacobs": "/marc-jacobs",
+#     "Marni": "/marni",
+#     "Mary Katrantzou": "/mary-katrantzou",
+#     "Michael Kors": "/michael-kors-collection",
+#     "Miu Miu": "/miu-miu",
+#     "Missoni": "/missoni",
+#     "Oscar de la Renta": "/oscar-de-la-renta",
+#     "Prada": "/prada",
+#     "Proenza Schouler": "/proenza-schouler",
+#     "Roksanda": "/roksanda",
+#     "Stella McCartney": "/stella-mccartney",
+#     "Saint Laurent": "/saint-laurent",
+#     "Tory Burch": "/tory-burch",
+#     "Valentino": "/valentino",
+#     "Vetements": "/vetements",
+# }
 
 
 def closest_color(color):
@@ -105,7 +97,6 @@ def closest_color(color):
         # print "MIN KEYS ONLY", min_colors[min(min_colors.keys())]
     return min_colors[min(min_colors.keys())]
 
-
 # def show_colors(final_colors):
 #     # A FXN TO AGGREGATE TOP COLORS BY SHOW
 #     # final_colors is PER image, need to aggregate all final_colors to show colors
@@ -126,11 +117,13 @@ def get_color_name(color):
     except ValueError:
         closest_name = closest_color(color)
         actual_name = None
+    print closest_name
     return closest_name
 
     # actual_name, closest_name = get_color_name(color)
 
     # print "closest color name: ", closest_name
+# get_color_name([231, 190, 56])
 
 
 def get_colors(img, img2):
@@ -182,39 +175,135 @@ def get_colors(img, img2):
     return final_named_colors
 
 
-def crop_image(img):
+Point = namedtuple('Point', ('coords', 'n', 'ct'))
+Cluster = namedtuple('Cluster', ('points', 'center', 'n'))
+
+
+def get_points(img):
+    points = []
+    w, h = img.size
+    for count, color in img.getcolors(w * h):
+        points.append(Point(color, 3, count))
+    return points
+
+
+def colorz(url, n=4):
+    img = crop_image(url)
+    w, h = img.size
+
+    points = get_points(img)
+    clusters = kmeans(points, n, 1)
+    rgbs = [map(int, c.center.coords) for c in clusters]
+    print "rgbs", rgbs
+    hex_codes = []
+    named_colors = []
+    # for rgb in rgbs:
+        # hex_codes.append(rgb_to_hex(rgb))
+    # print "hex codes", hex_codes
+    # for hex_code in hex_codes:
+        # color_names.append(hex_to_name(hex_codes))
+    # print "color names", color_names
+    for rgb in rgbs:
+        named_colors.append(get_color_name(rgb))
+    for name in named_colors:
+        hex_codes.append(name_to_hex(name))
+    print "hex:", hex_codes, "named:", named_colors
+    return named_colors
+
+# import ipdb; ipdb.set_trace()
+
+
+def euclidean(p1, p2):
+    return sqrt(sum([
+        (p1.coords[i] - p2.coords[i]) ** 2 for i in range(p1.n)
+    ]))
+
+
+def calculate_center(points, n):
+    vals = [0.0 for i in range(n)]
+    plen = 0
+    for p in points:
+        plen += p.ct
+        for i in range(n):
+            vals[i] += (p.coords[i] * p.ct)
+    return Point([(v / plen) for v in vals], n, 1)
+
+
+def kmeans(points, k, min_diff):
+    clusters = [Cluster([p], p, p.n) for p in random.sample(points, k)]
+
+    while 1:
+        plists = [[] for i in range(k)]
+
+        for p in points:
+            smallest_distance = float('Inf')
+            for i in range(k):
+                distance = euclidean(p, clusters[i].center)
+                if distance < smallest_distance:
+                    smallest_distance = distance
+                    idx = i
+            plists[idx].append(p)
+
+        diff = 0
+        for i in range(k):
+            old = clusters[i]
+            center = calculate_center(plists[i], old.n)
+            new = Cluster(plists[i], center, old.n)
+            clusters[i] = new
+            diff = max(diff, euclidean(old.center, new.center))
+
+        if diff < min_diff:
+            break
+
+    # print clusters
+    return clusters
+
+# GOT TO THUMBNAIL THE CROP BEFORE PROCESSINGS
+
+
+def crop_image(url):
     # crop the image and background sample
 
-    # print "hello at crop!"
+    # print "hello at crop!
+    response = requests.get(url)
+    img = Image.open(StringIO(response.content))
 
     width, height = img.size
+    print width, height
 
     left_box = ((.30) * width)
     top_box = ((.15) * height)
     width_box = ((.45) * width)
     height_box = ((.66) * height)
     box = (left_box, top_box, left_box+width_box, top_box+height_box)
-    # print "box", box
+    print "box", box
 
-    left_bg = ((0) * width)
-    top_bg = ((0) * height)
-    width_bg = ((.25) * width)
-    height_bg = ((.75) * height)
-    bg_box = (left_bg, top_bg, left_bg+width_bg, top_bg+height_bg)
+    # left_bg = ((0) * width)
+    # top_bg = ((0) * height)
+    # width_bg = ((.25) * width)
+    # height_bg = ((.75) * height)
+    # bg_box = (left_bg, top_bg, left_bg+width_bg, top_bg+height_bg)
     # print "bg_box", bg_box
 
     crop = img.crop(box)
-    bg_crop = img.crop(bg_box)
-    return get_colors(crop, bg_crop)
+    # bg_crop = img.crop(bg_box)
+    # LOE_crop = crop.save("loe_crop.jpg")
+    # loe_bg_crop = bg_crop.save("loe_bg_crop.jpg")
+    basewidth = 200
+    wpercent = (basewidth/float(crop.size[0]))
+    hsize = int((float(crop.size[1])*float(wpercent)))
+    img = crop.resize((basewidth, hsize))
+
+    return img
 
 
-def pillow_loop(img_urls):
-    # for url in img_urls:
-    # print "URL:", img_urls
-    response = requests.get(img_urls)
-    img = Image.open(StringIO(response.content))
-    # print "heading to crop"
-    return crop_image(img)
+# def pillow_loop(img_urls):
+#     # for url in img_urls:
+#     # print "URL:", img_urls
+#     response = requests.get(img_urls)
+#     img = Image.open(StringIO(response.content))
+#     # print "heading to crop"
+#     return crop_image(img)
 
 
 def img_urls(show_url):
@@ -254,7 +343,13 @@ def feed_urls():
 
                 top_show_colors = []
                 for url in image_urls:
-                    final_named_colors = pillow_loop(url)
+                    # get the colorz to return the final color list here
+                    final_named_colors = colorz(url)
+                    # import ipdb; ipdb.set_trace()
+
+                    print "final_named_colors", final_named_colors
+                    # should be the named_color list from crop image via colorz
+                    # return hex_codes, named_colors is what it should return
                     for color in final_named_colors:
                         top_show_colors.append(color)
                 print "at feed urls, top show colors: ", top_show_colors
@@ -262,7 +357,12 @@ def feed_urls():
                 count_colors = {color: top_show_colors.count(color) for color in top_show_colors}
                 top_show_colors = sorted(set(top_show_colors), key=count_colors.get, reverse=True)
                 top_show_colors = top_show_colors[:10]
+                print "top_show_colors", top_show_colors, type(top_show_colors)
                 load_show_colors(top_show_colors, brand, year, season)
+                print top_show_colors, brand, year, season 
+                import ipdb; ipdb.set_trace()
+                return top_show_colors, brand, year, season
+
                 # jus have to pass top show color & show (or just show.show_id)
 
 
@@ -320,7 +420,7 @@ def load_show(year, season, brand):
 
 
 def load_show_colors(top_show_colors, brand, year, season):
-    """Set value for each shows top 6 colors & seed """
+    """Set value for each shows top colors & seed """
 
     # show_id = db.session.query(Show.season == season,
     #                            Show.year == year,
@@ -349,6 +449,6 @@ if __name__ == "__main__":
 
     load_brands(brands)
     load_colors()
-    top_show_colors, year, brand, season = feed_urls()
+    top_show_colors, brand, year, season = feed_urls()
     load_show(year, season, brand)
     load_show_colors(top_show_colors, brand, year, season)
