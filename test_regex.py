@@ -1,7 +1,7 @@
 import requests
 import re
 
-show_url = "http://www.vogue.com/fashion-shows/spring-2015-ready-to-wear/givenchy"
+show_url = "http://www.vogue.com/fashion-shows/spring-2017-ready-to-wear/loewe"
 # spring 2016 tests:::: match = re.match(r'.*(http:.*/_(?!ARC|AG|UMB|A2X|GAS|MIC).*.jpg).*', l)
 # altuzarra got 49/41 images - additional detail shots that dont hurt
 # chanel got 109/100 images
@@ -29,7 +29,7 @@ show_url = "http://www.vogue.com/fashion-shows/spring-2015-ready-to-wear/givench
 # dolce got 104/97
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # spring 2015 tests
-# givenchy got 62/58 with ::::: match = re.match(r'.*(.*http:.*_MON.*jpg.*).*', l)
+# givenchy got 62/58 with ::::: match = re.match(r'.*(.*http:.*_MON.*jpg).*', l)
 # altuzarra got::::::: match = re.match(r'.*(.*http:.*KIM_.*jpg.*).*', l)
 # chanel worked on::::::::: match = re.match(r'.*(.*http:.*CHA_.*jpg.*).*', l)
 # valentino got match = re.match(r'.*(.*http:.*_MON.*jpg.*).*', l)
@@ -61,6 +61,8 @@ def img_urls(show_url):
             # match = re.match(r'.*(.*http:.*DOL_.*jpg.*).*', l)
             #below match works for marni spring 2015
             # match = re.match(r'.*(.*http:.*MAR_.*jpg.*).*', l)
+            # below works for margiela spring 2017
+            match = re.match(r'.*(.*http:.*_UMB.*jpg.*).*', l)
             # below works for vetements spring 2015
             # match = re.match(r'.*(.*http:.*Vetements.*jpg.*).*', l)
             # below for balmain spring 2015

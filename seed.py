@@ -11,66 +11,68 @@ from sklearn.cluster import KMeans
 from PIL import Image, ImageDraw, ImageColor, ImageFilter
 import requests
 import numpy as np
-# from StringIO import StringIO
 import os
 import random
 import sys
 from webcolors import *
 
 years = [2017]
-# seasons = ['fall', 'spring']
-seasons = ['spring']
-brands = {"Altuzarra": "/altuzarra"}
+seasons = ['fall', 'spring']
+# seasons = ['spring']
 # brands = {
-#     "Acne Studios": "/acne-studios",
-#     "Alexander McQueen": "/alexander-mcqueen",
-#     "Alexander Wang": "/alexander-wang",
-#     "Altuzarra": "/altuzarra",
-#     "Ann Demeulemeester": "/ann-demeulemeester",
-#     "Antonio Berardi": "/antonio-berardi",
-#     "Balenciaga": "/balenciaga",
-#     "Balmain": "/balmain",
-#     "Bottega Veneta": "/bottega-veneta",
-#     "Calvin Klein": "/calvin-klein",
-#     "Carven": "/carven",
-#     "Celine": "/celine",
-#     "Chanel": "/chanel",
-#     "Christian Dior": "/christian-dior",
-#     "Christopher Kane": "/christopher-kane",
-#     "Comme Des Garcons": "/comme-des-garcons",
-#     "Derek Lam": "/derek-lam",
-#     "Isabel Marant": "/isabel-marant",
-#     "Dolce Gabbana": "/dolce-gabbana",
-#     "Dries Van Noten": "/dries-van-noten",
-#     "Etro": "/etro",
-#     "Fendi": "/fendi",
-#     "Giambattista Valli": "/giambattista-valli",
-#     "Givenchy": "/givenchy",
-#     "Gucci": "/gucci",
-#     "Hermes": "/hermes",
-#     "J.W. Anderson": "/j-w-anderson",
-#     "Junya Watanabe": "/junya-watanabe",
-#     "Kenzo": "/kenzo",
-#     "Lanvin": "/lanvin",
-#     "Loewe": "/loewe",
-#     "Louis Vuitton": "/louis-vuitton",
-#     "Maison Margiela": "/maison-martin-margiela",
-#     "Marc Jacobs": "/marc-jacobs",
-#     "Marni": "/marni",
-#     "Mary Katrantzou": "/mary-katrantzou",
-#     "Michael Kors": "/michael-kors-collection",
-#     "Miu Miu": "/miu-miu",
-#     "Missoni": "/missoni",
-#     "Oscar de la Renta": "/oscar-de-la-renta",
-#     "Prada": "/prada",
-#     "Proenza Schouler": "/proenza-schouler",
-#     "Roksanda": "/roksanda",
-#     "Stella McCartney": "/stella-mccartney",
-#     "Saint Laurent": "/saint-laurent",
-#     "Tory Burch": "/tory-burch",
-#     "Valentino": "/valentino",
-#     "Vetements": "/vetements",
-# }
+#           "Acne Studios": "/acne-studios",
+#           "Loewe": "/loewe",
+#           "Marc Jacobs": "/marc-jacobs",
+#           "Oscar de la Renta": "/oscar-de-la-renta",
+#           "Valentino": "/valentino"
+#           }
+
+brands = {
+    "Acne Studios": "/acne-studios",
+    "Alexander McQueen": "/alexander-mcqueen",
+    "Alexander Wang": "/alexander-wang",
+    "Altuzarra": "/altuzarra",
+    "Ann Demeulemeester": "/ann-demeulemeester",
+    "Antonio Berardi": "/antonio-berardi",
+    "Balenciaga": "/balenciaga",
+    "Balmain": "/balmain",
+    "Carven": "/carven",
+    "Celine": "/celine",
+    "Chanel": "/chanel",
+    "Christian Dior": "/christian-dior",
+    "Christopher Kane": "/christopher-kane",
+    "Comme Des Garcons": "/comme-des-garcons",
+    "Isabel Marant": "/isabel-marant",
+    "Dolce Gabbana": "/dolce-gabbana",
+    "Dries Van Noten": "/dries-van-noten",
+    "Fendi": "/fendi",
+    "Giambattista Valli": "/giambattista-valli",
+    "Givenchy": "/givenchy",
+    "Gucci": "/gucci",
+    "Hermes": "/hermes",
+    "J.W. Anderson": "/j-w-anderson",
+    "Junya Watanabe": "/junya-watanabe",
+    "Kenzo": "/kenzo",
+    "Lanvin": "/lanvin",
+    "Loewe": "/loewe",
+    "Louis Vuitton": "/louis-vuitton",
+    "Maison Margiela": "/maison-martin-margiela",
+    "Marc Jacobs": "/marc-jacobs",
+    "Marni": "/marni",
+    "Mary Katrantzou": "/mary-katrantzou",
+    "Michael Kors": "/michael-kors-collection",
+    "Miu Miu": "/miu-miu",
+    "Missoni": "/missoni",
+    "Oscar de la Renta": "/oscar-de-la-renta",
+    "Prada": "/prada",
+    "Proenza Schouler": "/proenza-schouler",
+    "Roksanda": "/roksanda",
+    "Stella McCartney": "/stella-mccartney",
+    "Saint Laurent": "/saint-laurent",
+    "Tory Burch": "/tory-burch",
+    "Valentino": "/valentino",
+    "Vetements": "/vetements",
+}
 
 
 def closest_color(color):
@@ -126,53 +128,53 @@ def get_color_name(color):
 # get_color_name([231, 190, 56])
 
 
-def get_colors(img, img2):
-    # this function takes in bg & foreground colors and returns top img colors
-    # 1. convert image to palette format
-    img = img.convert('P')
-    img2 = img2.convert('P')
+# def get_colors(img, img2):
+#     # this function takes in bg & foreground colors and returns top img colors
+#     # 1. convert image to palette format
+#     img = img.convert('P')
+#     img2 = img2.convert('P')
 
-    # 2. convert imgs to RGB for getcolors fxn - returns rgb tuples
-    bg_colors = (img2.convert('RGB').getcolors())
-    foreground_colors = (img.convert('RGB').getcolors())
+#     # 2. convert imgs to RGB for getcolors fxn - returns rgb tuples
+#     bg_colors = (img2.convert('RGB').getcolors())
+#     foreground_colors = (img.convert('RGB').getcolors())
 
-    # 3. set up our lists to capture top colors for bg & foreground
-    final_bg_colors = []
-    final_colors = []
-    # 4. set up empty list to capture named final colors
-    final_named_colors = []
+#     # 3. set up our lists to capture top colors for bg & foreground
+#     final_bg_colors = []
+#     final_colors = []
+#     # 4. set up empty list to capture named final colors
+#     final_named_colors = []
 
-    named_bg_colors = []
-    named_foreground_colors = []
+#     named_bg_colors = []
+#     named_foreground_colors = []
 
-    # 6. these two loops return lists of named colors
-    for count, rgb in bg_colors:
-        named_bg_colors.append(get_color_name(rgb))
-    for count, rgb in foreground_colors:
-        named_foreground_colors.append(get_color_name(rgb))
+#     # 6. these two loops return lists of named colors
+#     for count, rgb in bg_colors:
+#         named_bg_colors.append(get_color_name(rgb))
+#     for count, rgb in foreground_colors:
+#         named_foreground_colors.append(get_color_name(rgb))
 
-    # 7. these create color/count pairs 
-    count_bg_colors = {color: named_bg_colors.count(color) for color in named_bg_colors}
-    count_foreground_colors = {color: named_foreground_colors.count(color) for color in named_foreground_colors}
+#     # 7. these create color/count pairs 
+#     count_bg_colors = {color: named_bg_colors.count(color) for color in named_bg_colors}
+#     count_foreground_colors = {color: named_foreground_colors.count(color) for color in named_foreground_colors}
 
-    # 8. these take the color/count pairs and sort them
-    sorted_bg_colors = sorted(count_foreground_colors.items(), key=lambda x: x[1], reverse=True)[:10]
-    sorted_foreground_colors = sorted(count_foreground_colors.items(), key=lambda x: x[1], reverse=True)[:10]
+#     # 8. these take the color/count pairs and sort them
+#     sorted_bg_colors = sorted(count_foreground_colors.items(), key=lambda x: x[1], reverse=True)[:10]
+#     sorted_foreground_colors = sorted(count_foreground_colors.items(), key=lambda x: x[1], reverse=True)[:10]
 
-    # 9. next i have to append top bg colors to final_bg_colors to compare foreground againsr
-    final_bg_colors.append(sorted_bg_colors)
+#     # 9. next i have to append top bg colors to final_bg_colors to compare foreground againsr
+#     final_bg_colors.append(sorted_bg_colors)
 
-    # 10. next i need to compare the fg colors against bg colors & append to the fg final color list
+#     # 10. next i need to compare the fg colors against bg colors & append to the fg final color list
 
-    for color, count in sorted_foreground_colors:
-        if color not in final_bg_colors:
-            final_colors.append(color)
-        else:
-            pass
+#     for color, count in sorted_foreground_colors:
+#         if color not in final_bg_colors:
+#             final_colors.append(color)
+#         else:
+#             pass
 
-    final_named_colors = final_colors[:10]
+#     final_named_colors = final_colors[:10]
 
-    return final_named_colors
+#     return final_named_colors
 
 
 Point = namedtuple('Point', ('coords', 'n', 'ct'))
@@ -188,14 +190,17 @@ def get_points(img):
 
 
 def colorz(url, n=4):
+    print "URL::::", url
     img = crop_image(url)
     w, h = img.size
+    print w, h
+    print "at colorz"
 
     points = get_points(img)
     clusters = kmeans(points, n, 1)
     rgbs = [map(int, c.center.coords) for c in clusters]
-    print "rgbs", rgbs
-    hex_codes = []
+    # print "rgbs", rgbs
+    # hex_codes = []
     named_colors = []
     # for rgb in rgbs:
         # hex_codes.append(rgb_to_hex(rgb))
@@ -205,9 +210,9 @@ def colorz(url, n=4):
     # print "color names", color_names
     for rgb in rgbs:
         named_colors.append(get_color_name(rgb))
-    for name in named_colors:
-        hex_codes.append(name_to_hex(name))
-    print "hex:", hex_codes, "named:", named_colors
+    # for name in named_colors:
+    #     hex_codes.append(name_to_hex(name))
+    # print "hex:", hex_codes, "named:", named_colors
     return named_colors
 
 # import ipdb; ipdb.set_trace()
@@ -258,25 +263,32 @@ def kmeans(points, k, min_diff):
     # print clusters
     return clusters
 
-# GOT TO THUMBNAIL THE CROP BEFORE PROCESSINGS
-
 
 def crop_image(url):
     # crop the image and background sample
 
-    # print "hello at crop!
+    print "hello at crop!"
     response = requests.get(url)
     img = Image.open(StringIO(response.content))
 
+    # def pillow_loop(img_urls):
+#     # for url in img_urls:
+#     # print "URL:", img_urls
+#     response = requests.get(img_urls)
+#     img = Image.open(StringIO(response.content))
+#     # print "heading to crop"
+#     return crop_image(img)
+# 2000 wide, 3000 high 
+# 
     width, height = img.size
-    print width, height
+    # 2000 width, 3000 height...so 600 x 450
 
     left_box = ((.30) * width)
     top_box = ((.15) * height)
-    width_box = ((.45) * width)
+    width_box = ((.35) * width)
     height_box = ((.66) * height)
     box = (left_box, top_box, left_box+width_box, top_box+height_box)
-    print "box", box
+    # print "box", box
 
     # left_bg = ((0) * width)
     # top_bg = ((0) * height)
@@ -306,7 +318,7 @@ def crop_image(url):
 #     return crop_image(img)
 
 
-def img_urls(show_url):
+def img_urls(show_url, brand, season):
     # this returns a list of images for a show
     image_urls = set()
 
@@ -316,10 +328,19 @@ def img_urls(show_url):
         print "got a hit!"
         html_body = r.text.split(",")
         for l in html_body:
-            match = re.match(r'.*(http:.*/_(?!ARC|AG|UMB).*.jpg).*', l)
+            match = re.match(r'.*(http.*(?:MAR|UMB|KIM|ALT|ARC|ALE|L7A|MON|BOT|CHA|DIO|CDG|DOL|FEN|VAL|GUC|HER|AG|WAT|MAR|KOR|KEN|STE|GIA|KAT|JUN|ROK|TEN|YSL|LUC|VET|WAN|LLL).*jpg).*', l)
+            # match = re.match(r'.*(.*http:.*_MAR.*jpg.*).*', l)
+            # match = re.match(r'.*(http:.*/_(?!ARC|AG|UMB|A2X|GAS|MIC).*.jpg).*', l)
             # match = re.match(r'.*(http:\/\/assets.vogue.com\/photos\/.*\/master\/pass\/.*.[jpg|JPG]).*', l)
             if match:
-                image_urls.add(match.group(1))
+                url = match.group(1)
+
+                if '_UMB' in url and season == 'spring' and designer == 'valentino' or 'acne' or ':
+                    image_urls.add(match.group(1))
+
+                if season == 'spring' and designer == 'valentino':
+                    match = re.match ....
+                    image_urls.add(match.group(1))
     # print "image urls:", image_urls
     # print len(image_urls)
     # image_urls = list(image_urls)
@@ -339,15 +360,19 @@ def feed_urls():
                 print "season", season
                 print "brand name:", brand
                 show = load_show(year, season, brand)
-                image_urls = img_urls(brand_url)
+                image_urls = img_urls(brand_url, brand, season)
 
                 top_show_colors = []
                 for url in image_urls:
+                    final_named_colors = []
                     # get the colorz to return the final color list here
-                    final_named_colors = colorz(url)
+                    try:
+                        final_named_colors = colorz(url)
+                    except Exception as e:
+                        print str(e)
                     # import ipdb; ipdb.set_trace()
 
-                    print "final_named_colors", final_named_colors
+                    # print "final_named_colors", final_named_colors
                     # should be the named_color list from crop image via colorz
                     # return hex_codes, named_colors is what it should return
                     for color in final_named_colors:
@@ -357,13 +382,15 @@ def feed_urls():
                 count_colors = {color: top_show_colors.count(color) for color in top_show_colors}
                 top_show_colors = sorted(set(top_show_colors), key=count_colors.get, reverse=True)
                 top_show_colors = top_show_colors[:10]
-                print "top_show_colors", top_show_colors, type(top_show_colors)
-                load_show_colors(top_show_colors, brand, year, season)
-                print top_show_colors, brand, year, season 
-                import ipdb; ipdb.set_trace()
-                return top_show_colors, brand, year, season
+                # print "top_show_colors", top_show_colors, type(top_show_colors)
+                
+                load_show_colors(top_show_colors, show)
+                # print top_show_colors, brand, year, season 
+                # import ipdb; ipdb.set_trace()
+    # FIXME:
+    # return top_show_colors, brand, year, season
 
-                # jus have to pass top show color & show (or just show.show_id)
+            # just have to pass top show color & show (or just show.show_id)
 
 
 def load_brands(brands):
@@ -419,17 +446,18 @@ def load_show(year, season, brand):
     return show
 
 
-def load_show_colors(top_show_colors, brand, year, season):
+def load_show_colors(top_show_colors, show):
     """Set value for each shows top colors & seed """
 
     # show_id = db.session.query(Show.season == season,
     #                            Show.year == year,
     #                            (Show.brands.brand_name == brand)).one().show_id
 
-    show_id = db.session.query(Show).join(Brand).filter(Show.season == season).\
-                                                        filter(Show.year == year).\
-                                                        filter(Brand.brand_name == brand).one().show_id
+    # show_id = db.session.query(Show).join(Brand).filter(Show.season == season).\
+    #                                                     filter(Show.year == year).\
+    #                                                     filter(Brand.brand_name == brand).one().show_id
     # db.session.add(show_id)
+    show_id = show.show_id
 
     # color_id = db.session.query(Color.color_name == (color for colors in top_show_colors)).one().color_id
 
@@ -449,6 +477,8 @@ if __name__ == "__main__":
 
     load_brands(brands)
     load_colors()
-    top_show_colors, brand, year, season = feed_urls()
-    load_show(year, season, brand)
-    load_show_colors(top_show_colors, brand, year, season)
+    # top_show_colors, brand, year, season = feed_urls()
+    feed_urls()
+    # year = 2017
+    # load_show(year, season, brand)
+    # load_show_colors(top_show_colors, brand, year, season)

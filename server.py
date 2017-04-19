@@ -8,13 +8,14 @@ import flask_sqlalchemy
 import flask_restless
 import json
 
+from sqlalchemy.sql import func
 
 from sqlalchemy import create_engine, Column, Integer, String, Date, Float
 
 
 app = Flask(__name__)
 # app.config['DEBUG'] = True
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres:///showme'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres:///showme'
 db = flask_sqlalchemy.SQLAlchemy(app)
 
 manager = flask_restless.APIManager(app, flask_sqlalchemy_db=db)
@@ -45,19 +46,6 @@ def index():
                            show_colors=show_colors,
                            colors=colors,
                            brands=brands)
-
-
-# @app.route('/api/all')
-# def api_all():
-#     shows = Show.query.all()
-#     show_colors = Show_Color.query.all()
-#     colors = Color.query.all()
-#     brands = Brand.query.all()
-
-#     resp = Response(response=jsonify({'key': 'value'}),
-#                     status=200,
-#                     mimetype="application/json")
-#     return resp
 
 
 @app.route('/_get_brands')
@@ -111,8 +99,6 @@ def get_show_colors_json():
 
     return jsonify(show_colors_json)
 
-# <Show_Color show_colors_id=1 show_id=1 color_id=2
-
 
 @app.route('/_get_color_by_brand')
 def get_colors_by_brand_json():
@@ -137,6 +123,146 @@ def get_colors_by_brand_json():
 
     return jsonify(brand_by_colors)
 
+# <Show_Color show_colors_id=1 show_id=1 color_id=2
+
+
+@app.route('/colorsovertime')
+def colors_over_time():
+
+    return render_template("colorsovertime.html")
+
+# @app.route('/streams')
+# def stream_me():
+
+#     return render_template("streamgraph.html")
+
+# what i want: {'x=season': epoch time, 'y=count': color_count}
+# each colo should have 2 dicts - count for fall,, count for spring
+# a list of colors in each season, and their counts
+# start off with year = Show.query.filter_by(year).all()
+# then with the season = Show.query.filter_by(season).all()
+# then with a list of the colors featured in season with hex value & count
+# color_name, color_hex = db.engine.execute("SELECT color_name, color_hex FROM colors WHERE color_id='x'"),
+
+    # final series empty list, append indv series to the series list up here
+    # examine types of series - make sure they are the type you think
+
+
+@app.route("/temp")
+def temp():
+    series = []
+
+    color_data = db.engine.execute("SELECT color_id, shows.season, shows.year, COUNT(*) FROM show_colors JOIN shows ON show_colors.show_id=shows.show_id GROUP BY color_id, shows.season, shows.year")
+
+    for l in color_data:
+        color_id = l[0],
+        # color_id:tuple
+        # print color_id, type(color_id)
+        season = l[1],
+        # season:tuple
+        # print season, type(season)
+        year = l[2],
+        # year: tuple
+        # print year, type(year)
+        color_count = l[3]
+        # color_count: long - type of int
+        # print color_count, type(color_count)
+
+        # if year == 2017:
+        if season[0] == 'spring':
+            # print "season at 0 is spring"
+            epoch_time = 1501545600
+        elif season[0] == 'fall':
+            # print "season at 0 is fall"
+            epoch_time = 1485907200
+        else: 
+            print season, type(season)
+
+        color_n = db.engine.execute("SELECT color_name FROM colors WHERE color_id=color_id")
+        color_n1 = color_n.fetchone()
+        color_name = color_n1.values()
+        color_h = db.engine.execute("SELECT color_hex FROM colors WHERE color_id=color_id")
+        color_h1 = color_h.fetchone()
+        color_hex = color_h1.values()
+
+        series.append([
+            {'name': color_name,
+             'data': [{'x': epoch_time, 'y': color_count}],
+             'color': color_hex
+             }
+             ])
+
+    # import ipdb; ipdb.set_trace()
+    # print "series", series, type(series)
+    return Response(json.dumps(series),  mimetype='application/json')
+    # return jsonify(series)
+
+
+@app.route('/stream')
+def make_stream():
+    # testing out streamgraph
+
+    # JUST WRITE A SQLALCHEMY QUERY TO RETREIVE:
+    """SELECT color_name, color_hex, count(color_name)
+    FROM colors 
+    JOIN show_colors ON color_id=show_colors.color_id
+    WHERE show.year=2017, show.season=fall
+    """
+
+    years = [2017]
+    seasons = ['fall', 'spring']
+    color_counter = []
+    import time
+    print("AHHHHHHHHHHH!")
+    start_time = time.time()
+    for year in years:
+        print("year", year)
+        for season in seasons:
+            print("season", season)
+            # give me all shows for each season
+            shows = Show.query.filter_by(season=season).all()
+            for show_id in shows:
+                print("show_id", show_id)
+                # give me all colors for all shows in season
+                show_colors = Show_Color.query.filter_by(show_id=Show.show_id).all()
+                for color in show_colors:
+                    print("color", color)
+                    color_objects = Color.query.filter_by(color_id=color.color_id).all()
+                    for color_object in color_objects:
+                        color_counter.append(
+                            (color_object.color_name, color_object.color_hex)
+                        )
+
+            counts = {color: color_counter.count(color) for color in color_counter}
+            color_name_hex, color_count = counts.keys(), counts.values()
+            color_by_name = []
+            color_by_hex = []
+            for n, h in color_name_hex:
+                color_by_name.append(n)
+                color_by_hex.append(h)
+
+            for color in color_by_name:
+                for hex_val in color_by_hex:
+                    color_name = color
+                    color_hex = hex_val
+
+            if year == 2017:
+                if season == 'spring':
+                    epoch_time = 1501545600
+                elif season == 'fall':
+                    epoch_time = 1485907200
+
+            series = [
+                    {'name': color_name,
+                     'data': [{'x': epoch_time, 'y': color_count}],
+                     'color': color_hex
+                     }
+                     ]
+    stop_time = time.time()
+    print(stop_time-start_time)
+    print jsonify(series)
+    return jsonify(series)
+
 
 @app.route('/pie')
 def pie():
@@ -160,7 +286,7 @@ def pie():
                 shows = Show.query.filter_by(season='spring', brand_id=brand_id).all()
         else:
             shows = Show.query.filter_by(brand_id=brand_id).all()
-
+    # need a year if else statement here once older years seeded
         for show in shows:
             show_colors = Show_Color.query.filter_by(show_id=show.show_id).all()
             for color in show_colors:
