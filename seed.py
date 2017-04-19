@@ -271,15 +271,6 @@ def crop_image(url):
     response = requests.get(url)
     img = Image.open(StringIO(response.content))
 
-    # def pillow_loop(img_urls):
-#     # for url in img_urls:
-#     # print "URL:", img_urls
-#     response = requests.get(img_urls)
-#     img = Image.open(StringIO(response.content))
-#     # print "heading to crop"
-#     return crop_image(img)
-# 2000 wide, 3000 high 
-# 
     width, height = img.size
     # 2000 width, 3000 height...so 600 x 450
 
@@ -309,15 +300,6 @@ def crop_image(url):
     return img
 
 
-# def pillow_loop(img_urls):
-#     # for url in img_urls:
-#     # print "URL:", img_urls
-#     response = requests.get(img_urls)
-#     img = Image.open(StringIO(response.content))
-#     # print "heading to crop"
-#     return crop_image(img)
-
-
 def img_urls(show_url, brand, season):
     # this returns a list of images for a show
     image_urls = set()
@@ -335,15 +317,87 @@ def img_urls(show_url, brand, season):
             if match:
                 url = match.group(1)
 
-                if '_UMB' in url and season == 'spring' and designer == 'valentino' or 'acne' or ':
-                    image_urls.add(match.group(1))
+                if '_UMB' in url and season == 'spring' and brand in ('Valentino', 'Acne Studios', 'Loewe', 'Marc Jacobs', 'Oscar de la Renta'):
+                    image_urls.add(url)
+                elif 'KIM' in url and season == 'spring' and brand in ('Alexander McQueen', 'Antonio Berardi', 'Christopher Kane', 'Marc Jacobs', 'Louis Vuitton', 'Isabel Marant', 'Dries Van Noten', 'Kenzo', 'Lanvin', 'Mary Katrantzou', 'Missoni'):
+                    image_urls.add(url)
+                elif '_ALE' in url and season == 'spring' and brand == 'Alexander Wang':
+                    image_urls.add(url)
+                elif '_ALT' in url and season == 'spring' and brand == 'Altuzarra':
+                    image_urls.add(url)
+                elif '_L7A' in url and season == 'spring' and brand == 'Ann Demeulemeester':
+                    image_urls.add(url)
+                elif '_MON' in url and season == 'spring' and brand in ('Balenciaga', 'Balmain', 'Celine', 'Givenchy', 'Miu Miu', 'Prada', 'Proenza Schouler'):
+                    image_urls.add(url)
+                elif '_BOT' in url and season == 'spring' and brand == 'Bottega Veneta':
+                    image_urls.add(url)
+                elif '_CHA' in url and brand == 'Chanel':
+                    image_urls.add(url)
+                elif '_DIO' in url and brand == 'Christian Dior':
+                    image_urls.add(url)
+                elif '_CDG' in url and season == 'spring' and brand == 'Comme Des Garcons':
+                    image_urls.add(url)
+                elif '_DOL' in url and brand == 'Dolce Gabbana':
+                    image_urls.add(url)
+                elif '_FEN' in url and season == 'spring' and brand == 'Fendi':
+                    image_urls.add(url)
+                elif '_VAL' in url and season == 'spring' and brand == 'Giambattista Valli':
+                    image_urls.add(url)
+                elif '_GUC' in url and brand == 'Gucci':
+                    image_urls.add(url)
+                elif '_HER' in url and brand == 'Hermes':
+                    image_urls.add(url)
+                elif '_AG' in url and season == 'spring' and brand == 'J.W. Anderson':
+                    image_urls.add(url)
+                elif '_WAT' in url and season == 'spring' and brand == 'Junya Watanabe':
+                    image_urls.add(url)
+                elif '_MAR' in url and season == 'spring' and brand in ('Maison Margiela', 'Marni'):
+                    image_urls.add(url)
+                elif '_KOR' in url and brand == 'Michael Kors':
+                    image_urls.add(url)
+                elif '_LUC' in url and season == 'spring' and brand in ('Tory Burch', 'Roksanda'):
+                    image_urls.add(url)
+                elif '_STE' in url and season == 'spring' and brand == 'Stella McCartney':
+                    image_urls.add(url)
+                elif '_YSL' in url and brand == 'Saint Laurent':
+                    image_urls.add(url)
+                elif '_VET' in url and season == 'spring' and brand == 'Vetements':
+                    image_urls.add(url)
+                elif '_UMB' in url and season == 'fall' and brand in ('Acne Studios', 'Altuzarra', 'Isabel Marant', 'Louis Vuitton', 'Marc Jacobs', 'Stella McCartney'):
+                    image_urls.add(url)
+                elif 'KIM' in url and season == 'fall' and brand in ('Alexander McQueen', 'Christopher Kane', 'Antonio Berardi', 'Comme Des Garcons', 'Dries Van Noten', 'Fendi', 'J.W. Anderson', 'Lanvin', 'Loewe'):
+                    image_urls.add(url)
+                elif '_WAN' in url and season == 'fall' and brand == 'Alexander Wang':
+                    image_urls.add(url)
+                elif '_LLL' in url and season == 'fall' and brand == 'Ann Demeulemeester':
+                    image_urls.add(url)
+                elif '_MON' in url and season == 'fall' and brand in ('Balenciaga', 'Balmain', 'Celine', 'Miu Miu', 'Prada', 'Proenza Schouler'):
+                    image_urls.add(url)
+                elif '_GIA' in url and season == 'fall' and brand == 'Giambattista Valli':
+                    image_urls.add(url)
+                elif '_KEN' in url and season == 'fall' and brand == 'Kenzo':
+                    image_urls.add(url)
+                elif '_MAR' in url and season == 'fall' and brand in ('Marni', 'Maison Margiela'):
+                    image_urls.add(url)
+                elif '_KAT' in url and season == 'fall' and brand == 'Mary Katrantzou':
+                    image_urls.add(url)
+                elif '_ROK' in url and season == 'fall' and brand == 'Roksanda':
+                    image_urls.add(url)
+                elif '_TEN' in url and season == 'fall' and brand == 'Oscar de la Renta':
+                    image_urls.add(url)
+                elif '_ARC' in url and season == 'fall' and brand in ('Missoni', 'Tory Burch', 'Vetements'):
+                    image_urls.add(url)
+                elif '_VAL' in url and season == 'fall' and brand == 'Valentino':
+                    image_urls.add(url)
 
-                if season == 'spring' and designer == 'valentino':
-                    match = re.match ....
-                    image_urls.add(match.group(1))
+
+
+
+
     # print "image urls:", image_urls
     # print len(image_urls)
     # image_urls = list(image_urls)
+    print "IMAGE URLS:", list(image_urls)
     return list(image_urls)
     # pillow_loop(image_urls)
 
