@@ -65,7 +65,7 @@
                       "season": $('#season :selected').val(),
                        "year": $('#year :selected').val()
                      }
-        console.log(params)
+        // console.log(params)
         $.get('/pie', params, function(data) {
             makeDoughnutChart(data)
         });
@@ -75,26 +75,13 @@
                       "season": $('#season :selected').val(),
                        "year": $('#year :selected').val()
                      }
-        console.log(params)
+        // console.log(params)
         $.get('/pie', params, function(data) {
             makeDoughnutChart(data)
         });
     }
 </script>
 
-<!-- <ul> 
-{% for show_color in show_colors %}
-    <br>
-        <li>
-        {{ show_color.shows.brands.brand_name }} {{show_color.shows.season}}
-        {{ show_color.show_id}}
-        </li>
-            <div id="color" style="background-color: {{ show_color.colors.color_hex }}; width: 50%; position: relative;">
-                {{ show_color.colors.color_hex }}
-            </div>        
-
-{% endfor %}
-</ul> -->
 <canvas id="chart"></canvas>
 
 <script>
@@ -110,12 +97,14 @@ var myDoughnutChart;
         myDoughnutChart = new Chart(ctx, {
             type: 'doughnut',
             data: results,
-            options: {}
+            options: {'legend': {'display': false}}
         });
     }
     </script>
 
+<!-- <script src="templates/stream.js" type="text/javascript"></script>
 
+<div id = "streamgraph"></div> -->
 
 </body>
 </html>

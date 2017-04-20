@@ -18,25 +18,12 @@ from webcolors import *
 
 years = [2017]
 seasons = ['fall', 'spring']
-# seasons = ['spring']
-# brands = {
-#           "Acne Studios": "/acne-studios",
-#           "Loewe": "/loewe",
-#           "Marc Jacobs": "/marc-jacobs",
-#           "Oscar de la Renta": "/oscar-de-la-renta",
-#           "Valentino": "/valentino"
-#           }
 
 brands = {
-    "Acne Studios": "/acne-studios",
     "Alexander McQueen": "/alexander-mcqueen",
-    "Alexander Wang": "/alexander-wang",
     "Altuzarra": "/altuzarra",
-    "Ann Demeulemeester": "/ann-demeulemeester",
-    "Antonio Berardi": "/antonio-berardi",
     "Balenciaga": "/balenciaga",
     "Balmain": "/balmain",
-    "Carven": "/carven",
     "Celine": "/celine",
     "Chanel": "/chanel",
     "Christian Dior": "/christian-dior",
@@ -46,32 +33,24 @@ brands = {
     "Dolce Gabbana": "/dolce-gabbana",
     "Dries Van Noten": "/dries-van-noten",
     "Fendi": "/fendi",
-    "Giambattista Valli": "/giambattista-valli",
     "Givenchy": "/givenchy",
     "Gucci": "/gucci",
     "Hermes": "/hermes",
     "J.W. Anderson": "/j-w-anderson",
-    "Junya Watanabe": "/junya-watanabe",
-    "Kenzo": "/kenzo",
-    "Lanvin": "/lanvin",
     "Loewe": "/loewe",
     "Louis Vuitton": "/louis-vuitton",
     "Maison Margiela": "/maison-martin-margiela",
     "Marc Jacobs": "/marc-jacobs",
     "Marni": "/marni",
-    "Mary Katrantzou": "/mary-katrantzou",
     "Michael Kors": "/michael-kors-collection",
     "Miu Miu": "/miu-miu",
     "Missoni": "/missoni",
     "Oscar de la Renta": "/oscar-de-la-renta",
     "Prada": "/prada",
     "Proenza Schouler": "/proenza-schouler",
-    "Roksanda": "/roksanda",
-    "Stella McCartney": "/stella-mccartney",
     "Saint Laurent": "/saint-laurent",
     "Tory Burch": "/tory-burch",
     "Valentino": "/valentino",
-    "Vetements": "/vetements",
 }
 
 
