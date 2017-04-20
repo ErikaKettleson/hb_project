@@ -1,0 +1,65 @@
+<!doctype html>
+<html>
+<head>
+    <title>ShowMeBubbles</title>
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.4/Chart.min.js"></script>
+
+
+</head>
+</head>
+</head>
+<body>
+<h1>ShowMeURBubbles</h1>
+<br>
+
+
+
+<script src="http://code.jquery.com/jquery.js"></script>
+
+<script type="text/javascript">
+    $( document ).load( "bubble.html", function() {
+        getAllData();
+    });
+
+    function getAllData() {
+        var params = {"brand_id": $('#designer :selected').val(),
+                      "season": $('#season :selected').val(),
+                       "year": $('#year :selected').val()
+                     }
+        // console.log(params)
+        $.get('/_get_show_colors', params, function(data) {
+            makeBubbleChart(data)
+        });
+    }
+</script>
+
+
+<canvas id="chart"></canvas>
+
+<script>
+    var options = {};
+    var ctx = document.getElementById("chart").getContext('2d');
+
+var myBubbleChart;
+
+    function makeBubbleChart(results) {
+        if (myBubbleChart) {
+            myBubbleChart.destroy();
+        }
+        myBubbleChart = new Chart(ctx, {
+            type: 'bubble',
+            data: results,
+            options: {}
+        });
+    }
+    </script>
+
+<!-- <script src="templates/stream.js" type="text/javascript"></script>
+
+<div id = "streamgraph"></div> -->
+
+</body>
+</html>

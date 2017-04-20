@@ -10,7 +10,7 @@ import json
 
 from sqlalchemy.sql import func
 
-from sqlalchemy import create_engine, Column, Integer, String, Date, Float
+from sqlalchemy import create_engine, Column, Integer, String, Date, Float, func
 
 
 app = Flask(__name__)
@@ -88,16 +88,49 @@ def get_colors_json():
 
 @app.route('/_get_show_colors')
 def get_show_colors_json():
-    show_colors_json = {}
-    for show_color in Show_Color.query.all():
-        show_colors_json[show_color.show_colors_id] = {
-            'show_color': show_color.colors.color_id,
-            'brand_name': show_color.shows.brands.brand_name,
-            'color_id': show_color.color_id,
-            'color_name': show_color.colors.color_name,
-        }
+    years = [2017]
+    series = []
+    sorted_rainbow_hex = {'#808080': 138, '#ADFF2F': 77, '#FFB6C1': 1, '#556B2F': 78, '#FF8C00': 107, '#9932CC': 19, '#8A2BE2': 21, '#BA55D3': 17, '#2F4F4F': 53, '#00008B': 30, '#DB7093': 5, '#0000FF': 28, '#DC143C': 3, '#DDA0DD': 11, '#4169E1': 33, '#DA70D6': 9, '#DCDCDC': 134, '#7B68EE': 23, '#AFEEEE': 49, '#E6E6FA': 26, '#800080': 16, '#FFF5EE': 114, '#6B8E23': 80, '#FF69B4': 6, '#000080': 32, '#228B22': 72, '#008B8B': 54, '#5F9EA0': 46, '#EE82EE': 12, '#D3D3D3': 135, '#FF00FF': 14, '#48D1CC': 56, '#FFFFFF': 132, '#F5DEB3': 97, '#00FA9A': 61, '#F08080': 124, '#808000': 86, '#FAEBD7': 103, '#A9A9A9': 137, '#7FFFD4': 59, '#C0C0C0': 136, '#7FFF00': 75, '#FFEBCD': 101, '#B0C4DE': 35, '#008080': 55, '#FFFACD': 88, '#FFD700': 91, '#000000': 140, '#008000': 73, '#8B4513': 113, '#FFF0F5': 4, '#FFFFF0': 83, '#6A5ACD': 24, '#FFFAFA': 123, '#4682B4': 40, '#FFEFD5': 100, '#EEE8AA': 89, '#00FF00': 71, '#FFDEAD': 102, '#CD853F': 109, '#ADD8E6': 44, '#E0FFFF': 48, '#F8F8FF': 27, '#D8BFD8': 10, '#BC8F8F': 125, '#FF6347': 120, '#FF0000': 127, '#00CED1': 52, '#A0522D': 115, '#FFC0CB': 2, '#9370DB': 22, '#CD5C5C': 126, '#FFF8DC': 92, '#800000': 131, '#B8860B': 94, '#FFA07A': 116, '#40E0D0': 58, '#FAFAD2': 82, '#DEB887': 105, '#F0FFFF': 47, '#2E8B57': 65, '#E9967A': 119, '#87CEEB': 42, '#D2B48C': 104, '#90EE90': 67, '#00FFFF': 51, '#8FBC8F': 69, '#7CFC00': 76, '#FFE4E1': 121, '#BDB76B': 87, '#F4A460': 111, '#F0FFF0': 66, '#9400D3': 18, '#3CB371': 64, '#F5FFFA': 62, '#20B2AA': 57, '#1E90FF': 38, '#708090': 37, '#F5F5DC': 81, '#66CDAA': 60, '#9ACD32': 79, '#C71585': 8, '#F5F5F5': 133, '#32CD32': 70, '#8B0000': 130, '#696969': 139, '#191970': 29, '#0000CD': 31, '#00BFFF': 43, '#483D8B': 25, '#6495ED': 34, '#FFA500': 99, '#00FF7F': 63, '#A52A2A': 128, '#FAF0E6': 108, '#778899': 36, '#FFE4B5': 98, '#B22222': 129, '#DAA520': 93, '#4B0082': 20, '#FFFAF0': 95, '#B0E0E6': 45, '#F0E68C': 90, '#FFFF00': 85, '#006400': 74, '#FFE4C4': 106, '#FDF5E6': 96, '#8B008B': 15, '#FF7F50': 117, '#FFFFE0': 84, '#FA8072': 122, '#FFDAB9': 110, '#D2691E': 112, '#FF1493': 7, '#98FB98': 68, '#F0F8FF': 39, '#87CEFA': 41, '#FF4500': 118}
 
-    return jsonify(show_colors_json)
+    color_object = Color.query.all()
+    for color in color_object:
+        color_id = color.color_id
+        color_name = color.color_name
+        color_hex = color.color_hex
+        rainbow_connection = sorted_rainbow_hex[color_hex.upper()]
+
+        for year in years:
+            # y = db.session.query(Show_Color).join(Show).filter(Show.year == year).filter(Show_Color.color_id == Color.color_id).count()
+            # x = Show_Color.query.join(Show).filter(Show.year == year).filter(Show_Color.color_id == Color.color_id).count()
+
+            # y = db.engine.execute(SELECT COUNT(show_id) FROM Show_Colors where color_id=color_id;)
+            yy = db.session.query(Show_Color).join(Show).filter_by(year = year).filter(Show_Color.color_id == Color.color_id).count()
+
+            series.append([
+                {'label': color_name,
+                 'data': [{'x': year, 'y': rainbow_connection, 'r': yy}],
+                 'backgroundColor': color_hex,
+                 'hoverBackgroundColor': color_hex,
+                 }]
+                 )
+
+    # data = {
+    #     'datasets': [
+    #         {
+    #             'label': "color_name",
+    #             'data': [
+    #                 {
+    #                     'x': 20,
+    #                     'y': 30,
+    #                     'r': 15
+    #                 },
+    #             ],
+    #             'backgroundColor': "color_hex",
+    #             'hoverBackgroundColor': "color_hex",
+    #         }]
+    #     }
+
+    return jsonify(series)
 
 
 @app.route('/_get_color_by_brand')
@@ -126,15 +159,80 @@ def get_colors_by_brand_json():
 # <Show_Color show_colors_id=1 show_id=1 color_id=2
 
 
-@app.route('/colorsovertime')
+@app.route('/bubbles')
 def colors_over_time():
+    return render_template("bubble.html")
 
-    return render_template("colorsovertime.html")
 
-# @app.route('/streams')
-# def stream_me():
+@app.route('/bubble_json')
+def more_bubbles():
 
-#     return render_template("streamgraph.html")
+    show_colors_json = {}
+    for show_color in Show_Color.query.all():
+        show_colors_json[show_color.color_id] = {
+            'color_name': show_color.colors.color_name,
+            'color_id': show_color.color_id,
+            'year': show_color.shows.year,
+            'color_hex': show_color.colors.color_hex,
+        }
+
+        show_colors_object = Show_Color.query.all()
+        color_name = show_color.colors.color_name
+        color_hex = show_color.colors.color_hex
+
+
+    color_counter = []
+
+    for color in show_colors:
+        color_objects = Color.query.filter_by(color_id=color.color_id).all()
+        for color_object in color_objects:
+            color_counter.append(
+                (color_object.color_name, color_object.color_hex)
+            )
+
+
+        # counts = {color: color_counter.count(color) for color in color_counter}
+        # color_name_hex, color_count = counts.keys(), counts.values()
+        # color_by_name = []
+        # color_by_hex = []
+        # for n, h in color_name_hex:
+        #     color_by_name.append(n)
+        #     color_by_hex.append(h)
+
+
+
+    data = {
+        'datasets': [
+            {
+                'label': 'Pink',
+                'data': [
+                    {
+                        'x': 20,
+                        'y': 30,
+                        'r': 15
+                    },
+                    {
+                        'x': 40,
+                        'y': 10,
+                        'r': 60
+                    },
+                    {
+                        'x': 26,
+                        'y': 20,
+                        'r': 80
+                    }
+                ],
+                'backgroundColor': "goldenrod",
+                'hoverBackgroundColor': "#FF6384",
+            }]
+    }
+    return jsonify(data)
+
+
+@app.route('/streams')
+def stream_me():
+
+    return render_template("streamgraph.html")
 
 # what i want: {'x=season': epoch time, 'y=count': color_count}
 # each colo should have 2 dicts - count for fall,, count for spring
@@ -152,31 +250,32 @@ def colors_over_time():
 def temp():
     series = []
 
-    color_data = db.engine.execute("SELECT color_id, shows.season, shows.year, COUNT(*) FROM show_colors JOIN shows ON show_colors.show_id=shows.show_id GROUP BY color_id, shows.season, shows.year")
+    color_data = db.engine.execute("SELECT color_id, shows.year, COUNT(*) FROM show_colors JOIN shows ON show_colors.show_id=shows.show_id GROUP BY color_id, shows.year")
 
     for l in color_data:
         color_id = l[0],
         # color_id:tuple
         # print color_id, type(color_id)
-        season = l[1],
+        # season = l[1],
         # season:tuple
         # print season, type(season)
-        year = l[2],
+        year = l[1],
         # year: tuple
         # print year, type(year)
-        color_count = l[3]
+        color_count = l[2]
         # color_count: long - type of int
         # print color_count, type(color_count)
-
-        # if year == 2017:
-        if season[0] == 'spring':
+        epoch_time = 1483228800
+        if year == 2017:
+            # if season[0] == 'spring':
             # print "season at 0 is spring"
-            epoch_time = 1501545600
-        elif season[0] == 'fall':
+            epoch_time = 1483228800
+        # elif season[0] == 'fall':
+        elif year == 2016:
             # print "season at 0 is fall"
-            epoch_time = 1485907200
+            epoch_time = 1451606400
         else: 
-            print season, type(season)
+            print year, type(year)
 
         color_n = db.engine.execute("SELECT color_name FROM colors WHERE color_id=color_id")
         color_n1 = color_n.fetchone()
@@ -192,7 +291,7 @@ def temp():
              }
              ])
 
-    # import ipdb; ipdb.set_trace()
+
     # print "series", series, type(series)
     return Response(json.dumps(series),  mimetype='application/json')
     # return jsonify(series)
@@ -275,7 +374,7 @@ def pie():
         brand_id = []
         for brand in Brand.query.all():
             brand_id.append(brand.brand_id)
-    # import ipdb; ipdb.set_trace()
+
     color_counter = []
 
     for brand_id in brand_id:

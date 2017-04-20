@@ -417,25 +417,26 @@ def feed_urls():
                 image_urls = img_urls(brand_url, brand, season)
 
                 top_show_colors = []
+                final_colors_for_show = []
+                neutral_colors = ['silver', 'whitesmoke', 'lightgrey', 'darkgray', 'gainsboro', 'dimgrey', 'linen', 'silver']
                 for url in image_urls:
                     final_named_colors = []
-                    # get the colorz to return the final color list here
                     try:
                         final_named_colors = colorz(url)
                     except Exception as e:
                         print str(e)
-                    # import ipdb; ipdb.set_trace()
 
-                    # print "final_named_colors", final_named_colors
-                    # should be the named_color list from crop image via colorz
-                    # return hex_codes, named_colors is what it should return
                     for color in final_named_colors:
                         top_show_colors.append(color)
                 print "at feed urls, top show colors: ", top_show_colors
 
                 count_colors = {color: top_show_colors.count(color) for color in top_show_colors}
-                top_show_colors = sorted(set(top_show_colors), key=count_colors.get, reverse=True)
-                top_show_colors = top_show_colors[:10]
+                ranked_show_colors = sorted(set(top_show_colors), key=count_colors.get, reverse=True)
+                for color in ranked_show_colors:
+                    if color not in neutral_colors:
+                        final_colors_for_show.append(color)
+                
+                top_show_colors = final_colors_for_show[:10]
                 # print "top_show_colors", top_show_colors, type(top_show_colors)
                 
                 load_show_colors(top_show_colors, show)
