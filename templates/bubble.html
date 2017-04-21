@@ -7,15 +7,12 @@
     <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.4/Chart.min.js"></script>
 
-
 </head>
 </head>
 </head>
 <body>
 <h1>ShowMeURBubbles</h1>
 <br>
-
-
 
 <script src="http://code.jquery.com/jquery.js"></script>
 
@@ -52,7 +49,7 @@ var myBubbleChart;
         myBubbleChart = new Chart(ctx, {
             type: 'bubble',
             data: results,
-            options: {}
+            options: {'legend': {'display': false}}
         });
     }
     </script>

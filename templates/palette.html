@@ -7,63 +7,33 @@
     <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.4/Chart.min.js"></script>
 
-
-</head>
-</head>
 </head>
 <body>
 <h1>ShowMeURPalettes</h1>
-<br>
 
-<script type="text/javascript">
-    $( document ).load( "palette.html", function() {
-        getAllData();
-    });
-
-    // $('#designer').on('change', function() {
-    //     getData($('#designer'))
-    // });
-
-    // $('#season').on('change', function() {
-    //     getData($('#season'))
-    // });
-
-    // $('#year').on('change', function() {
-    //     getData($('#year'))
-    // });
-
-
-    function getData(param) {
-        // var params = {"brand_id": $('#designer :selected').val(),
-        //               "season": $('#season :selected').val(),
-        //                "year": $('#year :selected').val()
-        //              }
-        // console.log(params)
-        params = 2017
-        $.get('/palette_chart', params, function(data) {
-            makeDoughnutChart(data)
-        });
-    }
-    function getAllData() {
-        // var params = {"brand_id": $('#designer :selected').val(),
-        //               "season": $('#season :selected').val(),
-        //                "year": $('#year :selected').val()
-        //              }
-        // console.log(params)
-        $.get('/palette_chart', function(data) {
-            makeDoughnutChart(data)
-        });
-    }
-</script>
-
+<script src="http://code.jquery.com/jquery.js"></script>
 
 <canvas id="chart"></canvas>
 
-<script>
+<script type="text/javascript">
+  console.log("hellooooo im here in JS trying to load!")
+    $( document ).ready(function() {
+      console.log("IM READY!")
+        getAllData();
+    });
+
+    function getAllData() {
+      console.log("oh what! im in getAllData ")
+        $.get('/palette_chart', function(data) {
+            makeDoughnutChart(data)
+            console.log(data)
+        });
+    }
+
     var options = {};
     var ctx = document.getElementById("chart").getContext('2d');
 
-var myDoughnutChart;
+    var myDoughnutChart;
 
     function makeDoughnutChart(results) {
         if (myDoughnutChart) {
@@ -72,15 +42,11 @@ var myDoughnutChart;
         myDoughnutChart = new Chart(ctx, {
             type: 'doughnut',
             data: results,
-            options: {'legend': {'display': false},
-                      'tooltips': {'enabled': true}}
+            options: {'legend': {'display': false}}
         });
     }
-    </script>
+</script>
 
-<!-- <script src="templates/stream.js" type="text/javascript"></script>
-
-<div id = "streamgraph"></div> -->
 
 </body>
 </html>
