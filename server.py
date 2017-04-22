@@ -59,33 +59,6 @@ def get_brands_json():
     return jsonify(brands)
 
 
-@app.route('/_get_shows')
-def get_shows_json():
-    shows = {}
-    for show in Show.query.all():
-        shows[show.show_id] = {
-            'show_id': show.show_id,
-            'show_season': show.season,
-            'show_year': show.year,
-            'brand_name': show.brands.brand_name,
-        }
-
-    return jsonify(shows)
-
-
-@app.route('/_get_colors')
-def get_colors_json():
-    colors = {}
-    for color in Color.query.all():
-        colors[color.color_id] = {
-            'color_id': color.color_id,
-            'color': color.color_name,
-            'color_hex': color.color_hex,
-        }
-
-    return jsonify(colors)
-
-
 @app.route('/_get_show_colors')
 def get_show_colors_json():
     years = [2017]
@@ -138,8 +111,22 @@ def get_colors_by_brand_json():
 
     return jsonify(brand_by_colors)
 
-# <Show_Color show_colors_id=1 show_id=1 color_id=2
 
+@app.route('/color_by_brand')
+def colors_brands():
+    
+    a_color_hex = request.args.get('color_hex')
+
+    show_colors = Show_Color.query.join(Color).filter(Color.color_hex == a_color_hex).all()
+    show_id_for_color = []
+    brands = set()
+    for x in show_colors:
+        show_id_for_color.append(x.show_id)
+    for show_id in show_id_for_color:
+        brand = Brand.query.join(Show).filter(Show.show_id == show_id).one().brand_name
+        brands.add(brand)
+
+    return jsonify({'brands': list(brands)})
 
 @app.route('/bubbles')
 def colors_over_time():
@@ -150,11 +137,6 @@ def colors_over_time():
 def palette():
     return render_template("palette.html")
 
-
-@app.route('/streams')
-def stream_me():
-
-    return render_template("streamgraph.html")
 
 @app.route("/temp")
 def temp():

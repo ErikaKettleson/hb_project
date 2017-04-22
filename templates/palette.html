@@ -6,6 +6,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.4/Chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
 
 </head>
 <body>
@@ -14,16 +15,23 @@
 <script src="http://code.jquery.com/jquery.js"></script>
 
 <canvas id="chart"></canvas>
+<div id=brand_list></div>
+<style type="text/css">
+    div {
+        display: block;
+        }
+    .brandlink {
+        padding: 5px;
+    }
+</style>
 
 <script type="text/javascript">
-  console.log("hellooooo im here in JS trying to load!")
     $( document ).ready(function() {
       console.log("IM READY!")
         getAllData();
     });
 
     function getAllData() {
-      console.log("oh what! im in getAllData ")
         $.get('/palette_chart', function(data) {
             makeDoughnutChart(data)
             console.log(data)
@@ -42,11 +50,32 @@
         myDoughnutChart = new Chart(ctx, {
             type: 'doughnut',
             data: results,
-            options: {'legend': {'display': false}}
-        });
-    }
-</script>
+            options: {rotation: 1 * Math.PI,
+                      circumference: 1 * Math.PI,
+                      cutoutPercentage: 25,
+                      'legend': {'display': false},
+                    }
+                });
+            }
 
+    function populateBrandsList(data) {
+        $("#brand_list").empty()
+
+        _.each(data.brands, function(brand) {
+            $("#brand_list").append('<a class="brandlink" href="/?brand_name=' + brand + '">[' + brand + ']</a>');
+        });
+    };
+
+    chart.onclick = function(evt){
+        var activePoints = myDoughnutChart.getElementsAtEvent(evt);
+        var params = {'color_hex': activePoints[0]._model.label}
+        $.get('/color_by_brand', params, function(data) {
+            populateBrandsList(data)
+        });
+    };
+
+
+</script>
 
 </body>
 </html>

@@ -6,6 +6,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.4/Chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
 
 
 </head>
@@ -65,12 +66,21 @@
                       "season": $('#season :selected').val(),
                        "year": $('#year :selected').val()
                      }
-        // console.log(params)
         $.get('/pie', params, function(data) {
             makeDoughnutChart(data)
         });
     }
     function getAllData() {
+        if (location.search) {
+            var brand_name = decodeURI(location.search.split('=')[1]);
+
+            _.each($('#designer option'), function(option) {
+                if(option.text == brand_name) {
+                    option.setAttribute('selected', 'selected');
+                }
+            });
+        }
+
         var params = {"brand_id": $('#designer :selected').val(),
                       "season": $('#season :selected').val(),
                        "year": $('#year :selected').val()
