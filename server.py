@@ -48,17 +48,6 @@ def index():
                            brands=brands)
 
 
-@app.route('/_get_brands')
-def get_brands_json():
-    brands = {}
-    for brand in Brand.query.all():
-        brands[brand.brand_id] = {
-            'brand_name': brand.brand_name,
-        }
-
-    return jsonify(brands)
-
-
 @app.route('/_get_show_colors')
 def get_show_colors_json():
     years = [2017]
@@ -128,6 +117,7 @@ def colors_brands():
 
     return jsonify({'brands': list(brands)})
 
+
 @app.route('/bubbles')
 def colors_over_time():
     return render_template("bubble.html")
@@ -183,10 +173,7 @@ def temp():
              }
              ])
 
-
-    # print "series", series, type(series)
     return Response(json.dumps(series),  mimetype='application/json')
-    # return jsonify(series)
 
 
 @app.route('/stream')

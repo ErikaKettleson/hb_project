@@ -1,6 +1,4 @@
-"""Utility file to seed database from pillow data/"""
 
-# import datetime
 from sqlalchemy import func
 from collections import namedtuple
 from model import Show, Show_Color, Brand, Color, connect_to_db, db
@@ -16,7 +14,7 @@ import random
 import sys
 from webcolors import *
 
-years = [2017]
+years = [2016]
 seasons = ['fall', 'spring']
 
 brands = {
@@ -78,21 +76,9 @@ def closest_color(color):
         # print "MIN KEYS ONLY", min_colors[min(min_colors.keys())]
     return min_colors[min(min_colors.keys())]
 
-# def show_colors(final_colors):
-#     # A FXN TO AGGREGATE TOP COLORS BY SHOW
-#     # final_colors is PER image, need to aggregate all final_colors to show colors
-#     show_colors = []
-#     for color in final_colors:
-#         show_colors.append(color)
-
-#     show_colors = final_colors[:6]
-#     return show_colors
-
 
 def get_color_name(color):
     # pillow errors out if it doesnt have the exact color name to rgb
-
-    # print "at get_color_name"
     try:
         closest_name = actual_name = rgb_to_name(color)
     except ValueError:
@@ -100,11 +86,6 @@ def get_color_name(color):
         actual_name = None
     print closest_name
     return closest_name
-
-    # actual_name, closest_name = get_color_name(color)
-
-    # print "closest color name: ", closest_name
-# get_color_name([231, 190, 56])
 
 
 # def get_colors(img, img2):
@@ -159,6 +140,7 @@ def get_color_name(color):
 Point = namedtuple('Point', ('coords', 'n', 'ct'))
 Cluster = namedtuple('Cluster', ('points', 'center', 'n'))
 
+#http://charlesleifer.com/blog/using-python-and-k-means-to-find-the-dominant-colors-in-images/
 
 def get_points(img):
     points = []
@@ -169,35 +151,27 @@ def get_points(img):
 
 
 def colorz(url, n=4):
+    # returns the 4 colors (n=4) by name
+    # pre-process image with crop_image, call point/cluster fxns
     print "URL::::", url
     img = crop_image(url)
     w, h = img.size
-    print w, h
-    print "at colorz"
 
     points = get_points(img)
     clusters = kmeans(points, n, 1)
     rgbs = [map(int, c.center.coords) for c in clusters]
-    # print "rgbs", rgbs
-    # hex_codes = []
+
     named_colors = []
-    # for rgb in rgbs:
-        # hex_codes.append(rgb_to_hex(rgb))
-    # print "hex codes", hex_codes
-    # for hex_code in hex_codes:
-        # color_names.append(hex_to_name(hex_codes))
-    # print "color names", color_names
+
     for rgb in rgbs:
         named_colors.append(get_color_name(rgb))
-    # for name in named_colors:
-    #     hex_codes.append(name_to_hex(name))
-    # print "hex:", hex_codes, "named:", named_colors
-    return named_colors
 
-# import ipdb; ipdb.set_trace()
+    return named_colors
 
 
 def euclidean(p1, p2):
+    # squared in order to place more weight on points that are farther from k
+    # called by kmeans, returns distance from points to the randon k cluster
     return sqrt(sum([
         (p1.coords[i] - p2.coords[i]) ** 2 for i in range(p1.n)
     ]))
@@ -214,6 +188,8 @@ def calculate_center(points, n):
 
 
 def kmeans(points, k, min_diff):
+    # n observations into k clusters
+    # returns clusters to the euclidian distance fxn
     clusters = [Cluster([p], p, p.n) for p in random.sample(points, k)]
 
     while 1:
@@ -239,38 +215,27 @@ def kmeans(points, k, min_diff):
         if diff < min_diff:
             break
 
-    # print clusters
     return clusters
 
 
 def crop_image(url):
-    # crop the image and background sample
+    # crop the image for quicker analysis and background sample
 
     print "hello at crop!"
     response = requests.get(url)
     img = Image.open(StringIO(response.content))
 
     width, height = img.size
-    # 2000 width, 3000 height...so 600 x 450
+    # 2000 width, 3000 height...so will be ~ 600 x 450/image
 
     left_box = ((.30) * width)
     top_box = ((.15) * height)
     width_box = ((.35) * width)
     height_box = ((.66) * height)
     box = (left_box, top_box, left_box+width_box, top_box+height_box)
-    # print "box", box
-
-    # left_bg = ((0) * width)
-    # top_bg = ((0) * height)
-    # width_bg = ((.25) * width)
-    # height_bg = ((.75) * height)
-    # bg_box = (left_bg, top_bg, left_bg+width_bg, top_bg+height_bg)
-    # print "bg_box", bg_box
 
     crop = img.crop(box)
-    # bg_crop = img.crop(bg_box)
-    # LOE_crop = crop.save("loe_crop.jpg")
-    # loe_bg_crop = bg_crop.save("loe_bg_crop.jpg")
+
     basewidth = 200
     wpercent = (basewidth/float(crop.size[0]))
     hsize = int((float(crop.size[1])*float(wpercent)))
@@ -280,111 +245,82 @@ def crop_image(url):
 
 
 def img_urls(show_url, brand, season):
-    # this returns a list of images for a show
+    # this returns a list of image urls for a show with regex feeding sort logic
     image_urls = set()
 
-    # print "getting: %s" % show_url
     r = requests.get(show_url)
     if r.status_code == 200:
         print "got a hit!"
         html_body = r.text.split(",")
         for l in html_body:
-            match = re.match(r'.*(http.*(?:MAR|UMB|KIM|ALT|ARC|ALE|L7A|MON|BOT|CHA|DIO|CDG|DOL|FEN|VAL|GUC|HER|AG|WAT|MAR|KOR|KEN|STE|GIA|KAT|JUN|ROK|TEN|YSL|LUC|VET|WAN|LLL).*jpg).*', l)
-            # match = re.match(r'.*(.*http:.*_MAR.*jpg.*).*', l)
-            # match = re.match(r'.*(http:.*/_(?!ARC|AG|UMB|A2X|GAS|MIC).*.jpg).*', l)
-            # match = re.match(r'.*(http:\/\/assets.vogue.com\/photos\/.*\/master\/pass\/.*.[jpg|JPG]).*', l)
+            match = re.match(r'.*(http.*(?:KIM|KAN|_ALT|_MON|_CHA|celine-fall-2016-ready-to-wear|_CDG|_DIO|_CDG|_DOL|_FEN|_VAL|_GUC|_HER|_AG|_MAR|_KOR|_TOR|_OSC|_A2X|_MIS|_DRI|KIM|_ARC).*jpg).*', l)
+
             if match:
                 url = match.group(1)
 
-                if '_UMB' in url and season == 'spring' and brand in ('Valentino', 'Acne Studios', 'Loewe', 'Marc Jacobs', 'Oscar de la Renta'):
+                if 'KIM' in url and season == 'fall' and brand in ('Alexander McQueen', 'Christopher Kane', 'Isabel Marant', 'Louis Vuitton', 'Maison Margiela', 'Marni', 'Saint Laurent'):
                     image_urls.add(url)
-                elif 'KIM' in url and season == 'spring' and brand in ('Alexander McQueen', 'Antonio Berardi', 'Christopher Kane', 'Marc Jacobs', 'Louis Vuitton', 'Isabel Marant', 'Dries Van Noten', 'Kenzo', 'Lanvin', 'Mary Katrantzou', 'Missoni'):
+                elif 'KAN' in url and season == 'spring' and brand == 'Christopher Kane':
                     image_urls.add(url)
-                elif '_ALE' in url and season == 'spring' and brand == 'Alexander Wang':
+                elif '_ALT' in url and season == 'fall' and brand == 'Altuzarra':
                     image_urls.add(url)
-                elif '_ALT' in url and season == 'spring' and brand == 'Altuzarra':
+                elif '_MON' in url and brand in ('Balenciaga', 'Balmain', 'Givenchy', 'Miu Miu', 'Prada', 'Proenza Schouler'):
                     image_urls.add(url)
-                elif '_L7A' in url and season == 'spring' and brand == 'Ann Demeulemeester':
+                elif '_MON' in url and season == 'spring' and brand == 'Celine':
                     image_urls.add(url)
-                elif '_MON' in url and season == 'spring' and brand in ('Balenciaga', 'Balmain', 'Celine', 'Givenchy', 'Miu Miu', 'Prada', 'Proenza Schouler'):
-                    image_urls.add(url)
-                elif '_BOT' in url and season == 'spring' and brand == 'Bottega Veneta':
+                elif 'celine-fall-2016-ready-to-wear' in url and season == 'fall' and brand == 'Celine':
                     image_urls.add(url)
                 elif '_CHA' in url and brand == 'Chanel':
                     image_urls.add(url)
                 elif '_DIO' in url and brand == 'Christian Dior':
                     image_urls.add(url)
-                elif '_CDG' in url and season == 'spring' and brand == 'Comme Des Garcons':
+                elif '_CDG' in url and brand == 'Comme Des Garcons':
                     image_urls.add(url)
                 elif '_DOL' in url and brand == 'Dolce Gabbana':
                     image_urls.add(url)
-                elif '_FEN' in url and season == 'spring' and brand == 'Fendi':
+                elif '_FEN' in url and season == 'fall' and brand == 'Fendi':
                     image_urls.add(url)
-                elif '_VAL' in url and season == 'spring' and brand == 'Giambattista Valli':
+                elif '_VAL' in url and brand == 'Valentino':
                     image_urls.add(url)
                 elif '_GUC' in url and brand == 'Gucci':
                     image_urls.add(url)
                 elif '_HER' in url and brand == 'Hermes':
                     image_urls.add(url)
-                elif '_AG' in url and season == 'spring' and brand == 'J.W. Anderson':
+                elif '_AG' in url and season == 'fall' and brand == 'J.W. Anderson':
                     image_urls.add(url)
-                elif '_WAT' in url and season == 'spring' and brand == 'Junya Watanabe':
-                    image_urls.add(url)
-                elif '_MAR' in url and season == 'spring' and brand in ('Maison Margiela', 'Marni'):
+                elif '_MAR' in url and season == 'spring' and brand == 'Marni':
                     image_urls.add(url)
                 elif '_KOR' in url and brand == 'Michael Kors':
                     image_urls.add(url)
-                elif '_LUC' in url and season == 'spring' and brand in ('Tory Burch', 'Roksanda'):
+                elif '_TOR' in url and brand == 'Tory Burch':
                     image_urls.add(url)
-                elif '_STE' in url and season == 'spring' and brand == 'Stella McCartney':
+                elif '_OSC' in url and brand == 'Oscar de la Renta':
                     image_urls.add(url)
-                elif '_YSL' in url and brand == 'Saint Laurent':
+                elif '_MON' in url and season == 'fall' and brand == 'Marc Jacobs':
                     image_urls.add(url)
-                elif '_VET' in url and season == 'spring' and brand == 'Vetements':
+                elif '_A2X' in url and season == 'spring' and brand in ('Marc Jacobs', 'Saint Laurent'):
                     image_urls.add(url)
-                elif '_UMB' in url and season == 'fall' and brand in ('Acne Studios', 'Altuzarra', 'Isabel Marant', 'Louis Vuitton', 'Marc Jacobs', 'Stella McCartney'):
+                elif '_MIS' in url and season == 'fall' and brand == 'Missoni':
                     image_urls.add(url)
-                elif 'KIM' in url and season == 'fall' and brand in ('Alexander McQueen', 'Christopher Kane', 'Antonio Berardi', 'Comme Des Garcons', 'Dries Van Noten', 'Fendi', 'J.W. Anderson', 'Lanvin', 'Loewe'):
+                elif 'KIM' in url and season == 'spring' and brand in ('Fendi', 'J.W. Anderson', 'Louis Vuitton', 'Maison Margiela', 'Missoni'):
                     image_urls.add(url)
-                elif '_WAN' in url and season == 'fall' and brand == 'Alexander Wang':
+                elif '_DRI' in url and season == 'spring' and brand == 'Dries Van Noten':
                     image_urls.add(url)
-                elif '_LLL' in url and season == 'fall' and brand == 'Ann Demeulemeester':
+                elif '_ARC' in url and season == 'fall' and brand in ('Alexander McQueen', 'Dries Van Noten', 'Loewe'):
                     image_urls.add(url)
-                elif '_MON' in url and season == 'fall' and brand in ('Balenciaga', 'Balmain', 'Celine', 'Miu Miu', 'Prada', 'Proenza Schouler'):
-                    image_urls.add(url)
-                elif '_GIA' in url and season == 'fall' and brand == 'Giambattista Valli':
-                    image_urls.add(url)
-                elif '_KEN' in url and season == 'fall' and brand == 'Kenzo':
-                    image_urls.add(url)
-                elif '_MAR' in url and season == 'fall' and brand in ('Marni', 'Maison Margiela'):
-                    image_urls.add(url)
-                elif '_KAT' in url and season == 'fall' and brand == 'Mary Katrantzou':
-                    image_urls.add(url)
-                elif '_ROK' in url and season == 'fall' and brand == 'Roksanda':
-                    image_urls.add(url)
-                elif '_TEN' in url and season == 'fall' and brand == 'Oscar de la Renta':
-                    image_urls.add(url)
-                elif '_ARC' in url and season == 'fall' and brand in ('Missoni', 'Tory Burch', 'Vetements'):
-                    image_urls.add(url)
-                elif '_VAL' in url and season == 'fall' and brand == 'Valentino':
+                elif '_ARC' in url and season == 'spring' and brand in ('Altuzarra', 'Isabel Marant', 'Loewe'):
                     image_urls.add(url)
 
 
 
-
-
-    # print "image urls:", image_urls
-    # print len(image_urls)
-    # image_urls = list(image_urls)
     print "IMAGE URLS:", list(image_urls)
     return list(image_urls)
-    # pillow_loop(image_urls)
 
 
 def feed_urls():
     # main fxn to call url generator and aggregate top colors by show
     generated_urls = {year: {season: {brand: 'http://www.vogue.com/fashion-shows/{}-{}-ready-to-wear{}'.format(season, year, brand_url) for brand, brand_url in brands.items()} for season in seasons} for year in years}
-    # print "generated urls:", generated_urls
+
     for year in generated_urls.keys():
         for season in generated_urls[year].keys():
             for brand, brand_url in generated_urls[year][season].items():
@@ -414,17 +350,10 @@ def feed_urls():
                 for color in ranked_show_colors:
                     if color not in neutral_colors:
                         final_colors_for_show.append(color)
-                
-                top_show_colors = final_colors_for_show[:10]
-                # print "top_show_colors", top_show_colors, type(top_show_colors)
-                
-                load_show_colors(top_show_colors, show)
-                # print top_show_colors, brand, year, season 
-                # import ipdb; ipdb.set_trace()
-    # FIXME:
-    # return top_show_colors, brand, year, season
 
-            # just have to pass top show color & show (or just show.show_id)
+                top_show_colors = final_colors_for_show[:10]
+
+                load_show_colors(top_show_colors, show)
 
 
 def load_brands(brands):
@@ -437,10 +366,8 @@ def load_brands(brands):
 
         brand = Brand(brand_name=brand_name)
 
-    # We need to add to the session or it won't ever be stored
         db.session.add(brand)
 
-    # Once we're done, we should commit our work
     db.session.commit()
 
 
@@ -456,7 +383,6 @@ def load_colors():
 
         db.session.add(color)
 
-    # Once we're done, we should commit our work
     db.session.commit()
 
 
@@ -481,19 +407,8 @@ def load_show(year, season, brand):
 
 
 def load_show_colors(top_show_colors, show):
-    """Set value for each shows top colors & seed """
 
-    # show_id = db.session.query(Show.season == season,
-    #                            Show.year == year,
-    #                            (Show.brands.brand_name == brand)).one().show_id
-
-    # show_id = db.session.query(Show).join(Brand).filter(Show.season == season).\
-    #                                                     filter(Show.year == year).\
-    #                                                     filter(Brand.brand_name == brand).one().show_id
-    # db.session.add(show_id)
     show_id = show.show_id
-
-    # color_id = db.session.query(Color.color_name == (color for colors in top_show_colors)).one().color_id
 
     for color in top_show_colors:
         print "color: ", color
@@ -509,10 +424,9 @@ if __name__ == "__main__":
     connect_to_db(app)
     db.create_all()
 
-    load_brands(brands)
-    load_colors()
-    # top_show_colors, brand, year, season = feed_urls()
+    # load_brands(brands)
+    # load_colors()
     feed_urls()
-    # year = 2017
+
     # load_show(year, season, brand)
     # load_show_colors(top_show_colors, brand, year, season)
