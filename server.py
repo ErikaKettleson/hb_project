@@ -50,7 +50,7 @@ def index():
 
 @app.route('/_get_show_colors')
 def get_show_colors_json():
-    years = [2017]
+    years = [2016, 2017]
     data_d = {'datasets': []}
     sorted_rainbow_hex = {'#808080': 138, '#ADFF2F': 77, '#FFB6C1': 1, '#556B2F': 78, '#FF8C00': 107, '#9932CC': 19, '#8A2BE2': 21, '#BA55D3': 17, '#2F4F4F': 53, '#00008B': 30, '#DB7093': 5, '#0000FF': 28, '#DC143C': 3, '#DDA0DD': 11, '#4169E1': 33, '#DA70D6': 9, '#DCDCDC': 134, '#7B68EE': 23, '#AFEEEE': 49, '#E6E6FA': 26, '#800080': 16, '#FFF5EE': 114, '#6B8E23': 80, '#FF69B4': 6, '#000080': 32, '#228B22': 72, '#008B8B': 54, '#5F9EA0': 46, '#EE82EE': 12, '#D3D3D3': 135, '#FF00FF': 14, '#48D1CC': 56, '#FFFFFF': 132, '#F5DEB3': 97, '#00FA9A': 61, '#F08080': 124, '#808000': 86, '#FAEBD7': 103, '#A9A9A9': 137, '#7FFFD4': 59, '#C0C0C0': 136, '#7FFF00': 75, '#FFEBCD': 101, '#B0C4DE': 35, '#008080': 55, '#FFFACD': 88, '#FFD700': 91, '#000000': 140, '#008000': 73, '#8B4513': 113, '#FFF0F5': 4, '#FFFFF0': 83, '#6A5ACD': 24, '#FFFAFA': 123, '#4682B4': 40, '#FFEFD5': 100, '#EEE8AA': 89, '#00FF00': 71, '#FFDEAD': 102, '#CD853F': 109, '#ADD8E6': 44, '#E0FFFF': 48, '#F8F8FF': 27, '#D8BFD8': 10, '#BC8F8F': 125, '#FF6347': 120, '#FF0000': 127, '#00CED1': 52, '#A0522D': 115, '#FFC0CB': 2, '#9370DB': 22, '#CD5C5C': 126, '#FFF8DC': 92, '#800000': 131, '#B8860B': 94, '#FFA07A': 116, '#40E0D0': 58, '#FAFAD2': 82, '#DEB887': 105, '#F0FFFF': 47, '#2E8B57': 65, '#E9967A': 119, '#87CEEB': 42, '#D2B48C': 104, '#90EE90': 67, '#00FFFF': 51, '#8FBC8F': 69, '#7CFC00': 76, '#FFE4E1': 121, '#BDB76B': 87, '#F4A460': 111, '#F0FFF0': 66, '#9400D3': 18, '#3CB371': 64, '#F5FFFA': 62, '#20B2AA': 57, '#1E90FF': 38, '#708090': 37, '#F5F5DC': 81, '#66CDAA': 60, '#9ACD32': 79, '#C71585': 8, '#F5F5F5': 133, '#32CD32': 70, '#8B0000': 130, '#696969': 139, '#191970': 29, '#0000CD': 31, '#00BFFF': 43, '#483D8B': 25, '#6495ED': 34, '#FFA500': 99, '#00FF7F': 63, '#A52A2A': 128, '#FAF0E6': 108, '#778899': 36, '#FFE4B5': 98, '#B22222': 129, '#DAA520': 93, '#4B0082': 20, '#FFFAF0': 95, '#B0E0E6': 45, '#F0E68C': 90, '#FFFF00': 85, '#006400': 74, '#FFE4C4': 106, '#FDF5E6': 96, '#8B008B': 15, '#FF7F50': 117, '#FFFFE0': 84, '#FA8072': 122, '#FFDAB9': 110, '#D2691E': 112, '#FF1493': 7, '#98FB98': 68, '#F0F8FF': 39, '#87CEFA': 41, '#FF4500': 118}
 
@@ -105,7 +105,6 @@ def get_colors_by_brand_json():
 def colors_brands():
     
     a_color_hex = request.args.get('color_hex')
-
     show_colors = Show_Color.query.join(Color).filter(Color.color_hex == a_color_hex).all()
     show_id_for_color = []
     brands = set()
@@ -114,7 +113,6 @@ def colors_brands():
     for show_id in show_id_for_color:
         brand = Brand.query.join(Show).filter(Show.show_id == show_id).one().brand_name
         brands.add(brand)
-
     return jsonify({'brands': list(brands)})
 
 
@@ -179,7 +177,7 @@ def temp():
 @app.route('/stream')
 def make_stream():
 
-    years = [2017]
+    years = [2016, 2017]
     seasons = ['fall', 'spring']
     color_counter = []
     import time
@@ -245,18 +243,38 @@ def pie():
         brand_id = []
         for brand in Brand.query.all():
             brand_id.append(brand.brand_id)
+    else:
+        brand_id = [brand_id]
 
     color_counter = []
 
+    params = {
+        'year': year,
+        'season': season,
+        'brand_id': None,
+    }
+
+    kwargs = params.copy()
+
+    for key, value in params.iteritems():
+        if value == 'All':
+            del kwargs[key]
+
     for brand_id in brand_id:
-        if season != 'All':
-            if season == 'Fall':
-                shows = Show.query.filter_by(season='fall', brand_id=brand_id).all()
-            elif season == 'Spring':
-                shows = Show.query.filter_by(season='spring', brand_id=brand_id).all()
-        else:
-            shows = Show.query.filter_by(brand_id=brand_id).all()
-    # need a year if else statement here once older years seeded
+        kwargs['brand_id'] = brand_id
+        shows = Show.query.filter_by(**kwargs).all()
+        # if year != 'All':
+        #     if year == 2017:
+        #         shows = Show.query.filter_by(year='2017', brand_id=brand_id).all()
+        #     elif year == 2016:
+        #         shows = Show.query.filter_by(year='2016', brand_id=brand_id).all()
+        # if season != 'All':
+        #     if season == 'Fall':
+        #         shows = Show.query.filter_by(season='fall', brand_id=brand_id).all()
+        #     elif season == 'Spring':
+        #         shows = Show.query.filter_by(season='spring', brand_id=brand_id).all()
+        # else:
+        #     shows = Show.query.filter_by(brand_id=brand_id).all()
         for show in shows:
             show_colors = Show_Color.query.filter_by(show_id=show.show_id).all()
             for color in show_colors:
@@ -287,7 +305,6 @@ def pie():
                 'hoverBackgroundColor': hoverBackgroundColor
             }]
         }
-
     return jsonify(data)
 
 
@@ -307,11 +324,13 @@ def palette_chart():
 
     x = color_hex
     data_color = color_order
+    data_color = [10 for x in range(0, 137)]
     backgroundColor = color_hex
     hoverBackgroundColor = color_hex
 
+
     data = {
-        'labels': x,
+        'labels': color_hex,
         'datasets': [{
             'data': data_color,
             'backgroundColor': backgroundColor,

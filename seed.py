@@ -393,7 +393,7 @@ def load_show(year, season, brand):
 
     brand_id = db.session.query(Brand).filter_by(brand_name=brand).one().brand_id
 
-    year = 2017
+    year = 2016
     show = Show(season=season,
                 year=year,
                 brand_id=brand_id)
