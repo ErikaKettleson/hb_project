@@ -6,16 +6,51 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.4/Chart.min.js"></script>
+</head>
 
-</head>
-</head>
-</head>
+<style>
+    body {
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        color: #ff1493;
+        background-color: #fcfaf7;
+        }
+    .navbar-default {
+        background-color: #faf7f3;
+        border-color: #ff141d;
+        }
+    .navbar-default .navbar-nav>li>a {
+        color: #ff141d;
+        }
+    .bootstrap-overridesh1 {
+        color: #ff141d;
+        font-size: 40px;
+    }
+</style>
+
 <body>
-<h1>ShowMeURBubbles</h1>
-<br>
+
+<nav class="navbar navbar-default">
+    <div class="container-fluid bg-1 text-center">
+        <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="/about"><img alt="ShowMe" src="/static/logo.png" height="20"</a>
+    </div>
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li><a href="/bubbles">Color Over Time<span class="sr-only"></span></a></li>
+        <li><a href="/palettes">Color Explorer</a></li>
+        <li><a href="/">Color By Brand</a></li>
+    </ul>
+    </div>
+    </div>
+    </nav>
 
 <script src="http://code.jquery.com/jquery.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
 <script type="text/javascript">
     $( document ).load( "bubble.html", function() {
@@ -27,15 +62,25 @@
                       "season": $('#season :selected').val(),
                        "year": $('#year :selected').val()
                      }
-        // console.log(params)
         $.get('/_get_show_colors', params, function(data) {
             makeBubbleChart(data)
         });
     }
 </script>
 
+<div class="container">
+    <div class="row">
+        <div class="col-sm-2">
+            <h1 class="bootstrap-overridesh1"> Show.Me</h1>
+            <h3 class="bootstrap-overridesh3"> Over Time</h3>
+            <h5 class="bootstrap-overridesh5">Analyzing the 600 most frequently used colors per year offers a higher level view of how colors change - or don't - over time. <br><br>Color bubbles are sized relative to their year over year use. Notable variations lie in lighter grey tones and browns. </h5>
+        </div>
 
-<canvas id="chart"></canvas>
+    <div class="col-sm-10">
+        <canvas id="chart"></canvas>
+        </div>
+    </div>
+</div>
 
 <script>
     var options = {};
@@ -50,11 +95,15 @@ var myBubbleChart;
         myBubbleChart = new Chart(ctx, {
             type: 'bubble',
             data: results,
-            options: {'legend': {'display': false}}
-        });
-    }
+            options: {'legend': {'display': false},
+                      'scales': {
+                        'xAxes': [{'ticks': {'display': false}}],
+                        'yAxes': [{'ticks': {'maxTicksLimit': 7}}]
+            }}
+            });
+        }
     </script>
 
-
+</div>
 </body>
 </html>

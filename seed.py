@@ -14,7 +14,7 @@ import random
 import sys
 from webcolors import *
 
-years = [2016]
+years = [2014]
 seasons = ['fall', 'spring']
 
 brands = {
@@ -35,7 +35,6 @@ brands = {
     "Gucci": "/gucci",
     "Hermes": "/hermes",
     "J.W. Anderson": "/j-w-anderson",
-    "Loewe": "/loewe",
     "Louis Vuitton": "/louis-vuitton",
     "Maison Margiela": "/maison-martin-margiela",
     "Marc Jacobs": "/marc-jacobs",
@@ -87,60 +86,12 @@ def get_color_name(color):
     print closest_name
     return closest_name
 
-
-# def get_colors(img, img2):
-#     # this function takes in bg & foreground colors and returns top img colors
-#     # 1. convert image to palette format
-#     img = img.convert('P')
-#     img2 = img2.convert('P')
-
-#     # 2. convert imgs to RGB for getcolors fxn - returns rgb tuples
-#     bg_colors = (img2.convert('RGB').getcolors())
-#     foreground_colors = (img.convert('RGB').getcolors())
-
-#     # 3. set up our lists to capture top colors for bg & foreground
-#     final_bg_colors = []
-#     final_colors = []
-#     # 4. set up empty list to capture named final colors
-#     final_named_colors = []
-
-#     named_bg_colors = []
-#     named_foreground_colors = []
-
-#     # 6. these two loops return lists of named colors
-#     for count, rgb in bg_colors:
-#         named_bg_colors.append(get_color_name(rgb))
-#     for count, rgb in foreground_colors:
-#         named_foreground_colors.append(get_color_name(rgb))
-
-#     # 7. these create color/count pairs 
-#     count_bg_colors = {color: named_bg_colors.count(color) for color in named_bg_colors}
-#     count_foreground_colors = {color: named_foreground_colors.count(color) for color in named_foreground_colors}
-
-#     # 8. these take the color/count pairs and sort them
-#     sorted_bg_colors = sorted(count_foreground_colors.items(), key=lambda x: x[1], reverse=True)[:10]
-#     sorted_foreground_colors = sorted(count_foreground_colors.items(), key=lambda x: x[1], reverse=True)[:10]
-
-#     # 9. next i have to append top bg colors to final_bg_colors to compare foreground againsr
-#     final_bg_colors.append(sorted_bg_colors)
-
-#     # 10. next i need to compare the fg colors against bg colors & append to the fg final color list
-
-#     for color, count in sorted_foreground_colors:
-#         if color not in final_bg_colors:
-#             final_colors.append(color)
-#         else:
-#             pass
-
-#     final_named_colors = final_colors[:10]
-
-#     return final_named_colors
-
-
 Point = namedtuple('Point', ('coords', 'n', 'ct'))
 Cluster = namedtuple('Cluster', ('points', 'center', 'n'))
 
+# k-means cluster from thi blog post:
 #http://charlesleifer.com/blog/using-python-and-k-means-to-find-the-dominant-colors-in-images/
+
 
 def get_points(img):
     points = []
@@ -196,6 +147,7 @@ def kmeans(points, k, min_diff):
         plists = [[] for i in range(k)]
 
         for p in points:
+            # unbounded upper value for comparison
             smallest_distance = float('Inf')
             for i in range(k):
                 distance = euclidean(p, clusters[i].center)
@@ -253,65 +205,83 @@ def img_urls(show_url, brand, season):
         print "got a hit!"
         html_body = r.text.split(",")
         for l in html_body:
-            match = re.match(r'.*(http.*(?:KIM|KAN|_ALT|_MON|_CHA|celine-fall-2016-ready-to-wear|_CDG|_DIO|_CDG|_DOL|_FEN|_VAL|_GUC|_HER|_AG|_MAR|_KOR|_TOR|_OSC|_A2X|_MIS|_DRI|KIM|_ARC).*jpg).*', l)
+            match = re.match(r'.*(http.*(?:_D7Q|_MG_|_J9D|MIS_|KOR_|_KOR|_CDG|_ARC|MAR_|_MAR|CDG_|GUC_|_THO|_GVC|_MMM|_OSC|VAL_|_AG|MJA_|DRI_|NOT_|_ISA|HER_|_ON_|CHA_|VUI_|FIO_|ALT_|_ALT|FEN_|_FEN|_DOL|DEG_).*(?:jpg|JPG)).*', l)
 
             if match:
                 url = match.group(1)
 
-                if 'KIM' in url and season == 'fall' and brand in ('Alexander McQueen', 'Christopher Kane', 'Isabel Marant', 'Louis Vuitton', 'Maison Margiela', 'Marni', 'Saint Laurent'):
+                if '_D7Q' in url and season == 'fall' and brand == 'Alexander McQueen':
                     image_urls.add(url)
-                elif 'KAN' in url and season == 'spring' and brand == 'Christopher Kane':
+                elif 'GUC_' in url and season == 'spring' and brand == 'Gucci':
                     image_urls.add(url)
-                elif '_ALT' in url and season == 'fall' and brand == 'Altuzarra':
+                elif '_THO' in url and season == 'spring' and brand == 'Tory Burch':
                     image_urls.add(url)
-                elif '_MON' in url and brand in ('Balenciaga', 'Balmain', 'Givenchy', 'Miu Miu', 'Prada', 'Proenza Schouler'):
+                elif '_GVC' in url and season == 'fall' and brand in ('Gucci'):
                     image_urls.add(url)
-                elif '_MON' in url and season == 'spring' and brand == 'Celine':
-                    image_urls.add(url)
-                elif 'celine-fall-2016-ready-to-wear' in url and season == 'fall' and brand == 'Celine':
-                    image_urls.add(url)
-                elif '_CHA' in url and brand == 'Chanel':
-                    image_urls.add(url)
-                elif '_DIO' in url and brand == 'Christian Dior':
-                    image_urls.add(url)
-                elif '_CDG' in url and brand == 'Comme Des Garcons':
-                    image_urls.add(url)
-                elif '_DOL' in url and brand == 'Dolce Gabbana':
-                    image_urls.add(url)
-                elif '_FEN' in url and season == 'fall' and brand == 'Fendi':
-                    image_urls.add(url)
-                elif '_VAL' in url and brand == 'Valentino':
-                    image_urls.add(url)
-                elif '_GUC' in url and brand == 'Gucci':
-                    image_urls.add(url)
-                elif '_HER' in url and brand == 'Hermes':
-                    image_urls.add(url)
-                elif '_AG' in url and season == 'fall' and brand == 'J.W. Anderson':
-                    image_urls.add(url)
-                elif '_MAR' in url and season == 'spring' and brand == 'Marni':
-                    image_urls.add(url)
-                elif '_KOR' in url and brand == 'Michael Kors':
-                    image_urls.add(url)
-                elif '_TOR' in url and brand == 'Tory Burch':
+                elif '_MMM' in url and brand == 'Maison Margiela':
                     image_urls.add(url)
                 elif '_OSC' in url and brand == 'Oscar de la Renta':
                     image_urls.add(url)
-                elif '_MON' in url and season == 'fall' and brand == 'Marc Jacobs':
+                elif 'VAL_' in url and brand == 'Valentino':
                     image_urls.add(url)
-                elif '_A2X' in url and season == 'spring' and brand in ('Marc Jacobs', 'Saint Laurent'):
+                elif '_AG' in url and season == 'fall' and brand == 'Marc Jacobs':
                     image_urls.add(url)
-                elif '_MIS' in url and season == 'fall' and brand == 'Missoni':
+                elif 'MJA_' in url and season == 'spring' and brand == 'Marc Jacobs':
                     image_urls.add(url)
-                elif 'KIM' in url and season == 'spring' and brand in ('Fendi', 'J.W. Anderson', 'Louis Vuitton', 'Maison Margiela', 'Missoni'):
+                if 'DRI_' in url and season == 'fall' and brand in ('Dries Van Noten'):
                     image_urls.add(url)
-                elif '_DRI' in url and season == 'spring' and brand == 'Dries Van Noten':
+                elif 'NOT_' in url and season == 'spring' and brand == 'Dries Van Noten':
                     image_urls.add(url)
-                elif '_ARC' in url and season == 'fall' and brand in ('Alexander McQueen', 'Dries Van Noten', 'Loewe'):
+                elif '_ISA' in url and season == 'fall' and brand == 'Isabel Marant':
                     image_urls.add(url)
-                elif '_ARC' in url and season == 'spring' and brand in ('Altuzarra', 'Isabel Marant', 'Loewe'):
+                elif 'HER_' in url and brand == 'Hermes':
                     image_urls.add(url)
-
-
+                elif '_ON_' in url and brand in ('Balenciaga', 'Balmain', 'Celine'):
+                    image_urls.add(url)
+                elif '_ON_' in url and season == 'spring' and brand in ('Alexander McQueen', 'Givenchy', 'Isabel Marant', 'Proenza Schouler', 'Saint Laurent'):
+                    image_urls.add(url)
+                elif '_ON_' in url and season == 'fall' and brand in ('Christian Dior', 'Miu Miu'):
+                    image_urls.add(url)
+                elif 'CHA_' in url and brand == 'Chanel':
+                    image_urls.add(url)
+                elif 'VUI_' in url and brand == 'Louis Vuitton':
+                    image_urls.add(url)
+                elif 'FIO_' in url and season == 'fall' and brand in ('Loewe'):
+                    image_urls.add(url)
+                elif 'ALT_' in url and season == 'spring' and brand == 'Altuzarra':
+                    image_urls.add(url)
+                elif '_ALT' in url and season == 'fall' and brand == 'Altuzarra':
+                    image_urls.add(url)
+                elif 'FEN_' in url and season == 'spring' and brand == 'Fendi':
+                    image_urls.add(url)
+                elif '_FEN' in url and season == 'fall' and brand == 'Fendi':
+                    image_urls.add(url)
+                elif '_DOL' in url and season == 'fall' and brand == 'Dolce Gabbana':
+                    image_urls.add(url)
+                elif 'DEG_' in url and season == 'spring' and brand == 'Dolce Gabbana':
+                    image_urls.add(url)
+                elif '_MG_' in url and season == 'spring' and brand in ('Christopher Kane', 'J.W. Anderson', 'Loewe', 'Miu Miu'):
+                    image_urls.add(url)
+                elif 'CDG_' in url and season == 'spring' and brand == 'Comme Des Garcons':
+                    image_urls.add(url)
+                elif '_CDG' in url and season == 'fall' and brand == 'Comme Des Garcons':
+                    image_urls.add(url)
+                elif '_ARC' in url and season == 'fall' and brand in ('Christopher Kane', 'Givenchy', 'J.W. Anderson', 'Missoni', 'Proenza Schouler', 'Saint Laurent', 'Tory Burch'):
+                    image_urls.add(url)
+                elif 'MAR_' in url and season == 'spring' and brand == 'Marni':
+                    image_urls.add(url)
+                elif '_MAR' in url and season == 'fall' and brand == 'Marni':
+                    image_urls.add(url)
+                elif 'MIS_' in url and season == 'spring' and brand == 'Missoni':
+                    image_urls.add(url)
+                elif 'KOR_' in url and season == 'spring' and brand == 'Michael Kors':
+                    image_urls.add(url)
+                elif '_KOR' in url and season == 'fall' and brand == 'Michael Kors':
+                    image_urls.add(url)
+                elif '_J9D' in url and season == 'fall' and brand == 'Prada':
+                    image_urls.add(url)
+                elif '_MG_' in url and season == 'spring' and brand == 'Prada':
+                    image_urls.add(url)
 
     print "IMAGE URLS:", list(image_urls)
     return list(image_urls)
@@ -393,7 +363,7 @@ def load_show(year, season, brand):
 
     brand_id = db.session.query(Brand).filter_by(brand_name=brand).one().brand_id
 
-    year = 2016
+    year = 2013
     show = Show(season=season,
                 year=year,
                 brand_id=brand_id)
