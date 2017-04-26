@@ -14,7 +14,7 @@ import random
 import sys
 from webcolors import *
 
-years = [2014]
+years = [2013]
 seasons = ['fall', 'spring']
 
 brands = {
@@ -246,7 +246,7 @@ def img_urls(show_url, brand, season):
                     image_urls.add(url)
                 elif 'VUI_' in url and brand == 'Louis Vuitton':
                     image_urls.add(url)
-                elif 'FIO_' in url and season == 'fall' and brand in ('Loewe'):
+                elif 'FIO_' in url and season == 'fall' and brand == 'Loewe':
                     image_urls.add(url)
                 elif 'ALT_' in url and season == 'spring' and brand == 'Altuzarra':
                     image_urls.add(url)
