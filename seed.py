@@ -89,7 +89,7 @@ def get_color_name(color):
 Point = namedtuple('Point', ('coords', 'n', 'ct'))
 Cluster = namedtuple('Cluster', ('points', 'center', 'n'))
 
-# k-means cluster from thi blog post:
+# k-means cluster algorithm from this blog post:
 #http://charlesleifer.com/blog/using-python-and-k-means-to-find-the-dominant-colors-in-images/
 
 

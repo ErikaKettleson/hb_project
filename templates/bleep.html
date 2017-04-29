@@ -37,25 +37,25 @@
 
 
 <body>
-<nav class="navbar navbar-default">
-    <div class="container-fluid bg-1 text-center">
-        <div class="navbar-header">
-        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-        <span class="sr-only">Toggle navigation</span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-      </button>
-      <a class="navbar-brand" href="/about"><img alt="ShowMe" src="/static/logowheel.png" height="20"></a>
-    </div>
-    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-      <ul class="nav navbar-nav">
-        <li><a href="/bubbles">Color Over Time<span class="sr-only"></span></a></li>
-        <li><a href="/palettes">Color Explorer</a></li>
-        <li><a href="/">Color By Brand</a></li>
-    </ul>
-    </div>
-    </div>
+    <nav class="navbar navbar-default">
+        <div class="container-fluid bg-1 text-center">
+            <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="/about"><img alt="ShowMe" src="/static/logowheel.png" height="20"></a>
+        </div>
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+          <ul class="nav navbar-nav">
+            <li><a href="/bubbles">Color Over Time<span class="sr-only"></span></a></li>
+            <li><a href="/palettes">Color Explorer</a></li>
+            <li><a href="/">Color By Brand</a></li>
+        </ul>
+        </div>
+        </div>
     </nav>
 
 <div class="container">
@@ -68,7 +68,7 @@
     <div class="dropdown pull-left" id="bootmedropdown">
     <form name='Year' class="form-inline">
         <select name="year" id='year' class="form-control">>
-          <option value="All">&#160;All Years</option>
+          <option value="All">All Years</option>
           <option value='2017'>2017</option>
           <option value='2016'>2016</option>
           <option value='2015'>2015</option>
@@ -81,7 +81,7 @@
     <div class="dropdown pull-left">
         <form name='Season' class="form-inline">
             <select name="season" id='season' class="form-control">>
-              <option value="All">&#160;All Seasons</option>
+              <option value="All">All Seasons</option>
               <option value="fall">Fall</option>
               <option value="spring">Spring</option>
             </select>
@@ -91,7 +91,7 @@
     <div class="dropdown pull-left">
         <form name='Designer' class="form-inline">
             <select name="designer" id='designer' class="form-control">>
-              <option value="All">&#160;All Designers</option>
+              <option value="All">All Designers</option>
             {% for brand in brands|sort(attribute='brand_name') %}
               <option value="{{ brand.brand_id }}">{{ brand.brand_name }}</option>
               {% endfor %}
@@ -99,6 +99,7 @@
         </form>
     </div>
 </div>
+
 <script src="http://code.jquery.com/jquery.js"></script>
 
 <script type="text/javascript">
@@ -148,11 +149,13 @@
         });
     }
 </script>
-<div class="col-sm-10">
-    <canvas id="chart"></canvas>
+
+    <div class="col-sm-10">
+        <canvas id="chart"></canvas>
+    </div>
 </div>
 </div>
-</div>
+
 <script>
     var options = {};
     var ctx = document.getElementById("chart").getContext('2d');
