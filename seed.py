@@ -14,6 +14,7 @@ import random
 import sys
 from webcolors import *
 
+# I populated each year with two seasons and 30 brands
 years = [2013]
 seasons = ['fall', 'spring']
 
