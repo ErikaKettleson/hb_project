@@ -95,8 +95,8 @@ def get_show_colors_json():
 @app.route('/color_by_brand')
 def colors_brands():
     # json to populate related brands from click on color slice on explorer
-    a_color_hex = request.args.get('color_hex')
-    show_colors = Show_Color.query.join(Color).filter(Color.color_hex == a_color_hex).all()
+    a_color_hex = request.args.get('color_hex').lower()
+    show_colors = Show_Color.query.join(Color).filter(a_color_hex == Color.color_hex).all()
     show_id_for_color = []
     brands = set()
     for x in show_colors:
