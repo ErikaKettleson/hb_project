@@ -48,13 +48,13 @@
         <span class="icon-bar"></span>
       </button>
 
-      <a class="navbar-brand" href="/about"><img alt="Show.Me" src="/static/logowheel.png" height="20"></a>
+      <a class="navbar-brand" href="/"><img alt="Show.Me" src="/static/logowheel.png" height="20"></a>
     </div>
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       <ul class="nav navbar-nav">
         <li><a href="/bubbles">Color Over Time<span class="sr-only"></span></a></li>
         <li><a href="/palettes">Color Explorer</a></li>
-        <li><a href="/">Color By Brand</a></li>
+        <li><a href="/brands">Color By Brand</a></li>
     </ul>
     </div>
     </div>
@@ -112,14 +112,13 @@
         $("#brand_list").empty()
 
         _.each(data.brands, function(brand) {
-            $("#brand_list").append('<a class="brandlink" href="/?brand_name=' + brand + '">[' + brand + ']</a>');
+            $("#brand_list").append('<a class="brandlink" href="/brands?brand_name=' + brand + '">[' + brand + ']</a>');
         });
     };
 
     chart.onclick = function(evt){
         var activePoints = myDoughnutChart.getElementsAtEvent(evt);
         var params = {'color_hex': activePoints[0]._model.label}
-        console.log(params)
         $.get('/color_by_brand', params, function(data) {
             populateBrandsList(data)
         });

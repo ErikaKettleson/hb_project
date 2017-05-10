@@ -1,6 +1,5 @@
 from jinja2 import StrictUndefined
 from flask import Flask, render_template, request, flash, redirect, session, jsonify, Response
-from flask_debugtoolbar import DebugToolbarExtension
 from model import Show, Show_Color, Brand, Color, connect_to_db, db
 from flask_sqlalchemy import SQLAlchemy
 import flask_sqlalchemy
@@ -13,7 +12,6 @@ from sqlalchemy import create_engine, Column, Integer, String, Date, Float, func
 
 
 app = Flask(__name__)
-# app.config['DEBUG'] = True
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres:///showme'
 db = flask_sqlalchemy.SQLAlchemy(app)
 
@@ -24,22 +22,22 @@ color_blueprint = manager.create_api(Color, methods=['GET'])
 show_color_blueprint = manager.create_api(Show_Color, methods=['GET'])
 
 # Required to use Flask sessions and the debug toolbar
-app.secret_key = "ABC"
+app.secret_key = "XoC92aXfNMKLKR5"
 
 # allows undefined jinja variables to raise an error.
 app.jinja_env.undefined = StrictUndefined
 app.jinja_env.auto_reload = True
 
 
-@app.route('/')
+@app.route('/brands')
 def index():
-    """Homepage."""
+    """shows the colors by brands page."""
     shows = Show.query.all()
     show_colors = Show_Color.query.all()
     colors = Color.query.all()
     brands = Brand.query.all()
 
-    return render_template("bleep.html",
+    return render_template("brands.html",
                            shows=shows,
                            show_colors=show_colors,
                            colors=colors,
@@ -52,7 +50,7 @@ def colors_over_time():
     return render_template("bubble.html")
 
 
-@app.route('/about')
+@app.route('/')
 def about_showme():
     # shows the about page
     return render_template("about.html")
@@ -215,6 +213,6 @@ if __name__ == "__main__":
     connect_to_db(app)
 
     # Use the DebugToolbar
-    DebugToolbarExtension(app)
+    # DebugToolbarExtension(app)
 
     app.run(host="0.0.0.0")
